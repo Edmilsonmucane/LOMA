@@ -13,9 +13,14 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos previstos (M0)
+## Comandos (M1)
 
 - pnpm install --frozen-lockfile
+- pnpm services:start / pnpm services:stop
+- pnpm local:env / pnpm local:seed
+- pnpm db:types (após migrações)
+- pnpm backup:local (dump privado; ver docs/RECOVERY.md)
+- pnpm test:rls (antes de Playwright; usa serviços reais)
 - pnpm dev
 - pnpm typecheck
 - pnpm lint
@@ -27,3 +32,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 ## Memória
 
 Ler docs/DECISIONS.md, docs/ARCHITECTURE.md e docs/DESIGN.md antes de alterações estruturais. Não declarar marcos aceites sem validação executada.
+
+## Segurança de M1
+
+Operações de negócio usam cliente Supabase com cookies do utilizador e RLS. Service-role apenas para convites já autorizados; nunca para contornar políticas. Helpers SQL com search_path vazio; índices e chaves estrangeiras compostas com tenant_id. Não alterar migrações já aplicadas. .local e .env.local são privados, nunca imprimir os seus valores.

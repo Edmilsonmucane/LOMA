@@ -154,3 +154,8 @@ vite.config.ts.timestamp-*
 playwright-report/
 test-results/
 next-env.d.ts
+
+# Local Supabase state and generated credentials
+supabase/.temp/
+supabase/.branches/
+.local/

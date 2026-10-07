@@ -1,0 +1,40 @@
+import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { resolveTenantSlug } from './lib/domain/tenancy';
+export async function proxy(request: NextRequest) {
+  try {
+    resolveTenantSlug(
+      request.headers.get('host') ?? '',
+      process.env.PLATFORM_BASE_DOMAIN ?? 'localhost',
+    );
+  } catch {
+    return new NextResponse(null, { status: 404 });
+  }
+  let response = NextResponse.next({ request });
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return response;
+  const client = createServerClient(url, key, {
+    cookieOptions: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    },
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (values) => {
+        values.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        values.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options),
+        );
+      },
+    },
+  });
+  await client.auth.getUser();
+  return response;
+}
+export const config = {
+  matcher: ['/app/:path*', '/platform/:path*', '/login', '/auth/:path*'],
+};

@@ -14,7 +14,14 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "services:start": "node scripts/services-start.mjs",
+    "services:stop": "docker compose --env-file .local/runtime.env -f supabase/compose.local.yml stop",
+    "local:env": "node scripts/local-env.mjs",
+    "local:seed": "node scripts/local-seed.mjs",
+    "db:types": "node scripts/database-types.mjs",
+    "test:rls": "node scripts/test-rls.mjs",
+    "backup:local": "node scripts/backup-local.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
@@ -22,11 +29,14 @@
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.0",
+    "@types/pg": "^8.23.1",
     "@vitest/coverage-v8": "5.0.3",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.0",
     "jsdom": "^27.0.0",
+    "pg": "^8.23.1",
     "prettier": "^3.6.0",
+    "supabase": "2.75.0",
     "typescript": "^5.9.0",
     "vitest": "5.0.3"
   },

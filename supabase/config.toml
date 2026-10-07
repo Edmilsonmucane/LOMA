@@ -1,0 +1,20 @@
+# CLI configuration for schema tooling / hosted Supabase.
+# Local runtime is supabase/compose.local.yml, started with pnpm services:start.
+project_id = "loma"
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+[db]
+port = 54322
+major_version = 17
+[db.seed]
+enabled = false
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://*.localhost:3000/auth/callback"]
+enable_signup = false
+[auth.email.template.invite]
+subject = "Convite para a equipa do microcrédito"
+content_path = "./supabase/templates/invite.html"

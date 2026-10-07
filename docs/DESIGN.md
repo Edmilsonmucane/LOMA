@@ -33,3 +33,9 @@ Sem gradientes, vidro, manchas desfocadas, sombras repetidas, ícones em círcul
 ## Validação M0
 
 Catálogo revisto visualmente a 1440px e 390px. Testes Playwright em computador e Pixel 7 verificam ausência de overflow da página, foco/restauração do drawer, pesquisa e estados vazios, tabs, densidade, marca e reduced motion. Scans axe WCAG AA passaram nos três contextos (catálogo, drawer, pesquisa). Estados desactivados distinguem-se visualmente; elementos icon-only têm nomes acessíveis. A tabela mantém scroll local em ecrãs estreitos. Avaliação com leitor de ecrã real e metas Lighthouse do site público pertencem ao acabamento dos respectivos marcos.
+
+## M1 — Aplicação autenticada
+
+Barra lateral de 224px, seis módulos principais e dois itens inferiores, filtrados pelas permissões. Em móvel, navegação num drawer e cabeçalho compacto. Conteúdo com linhas finas, espaçamento de 4px, superfícies neutras; marca e contraste derivados da cor do tenant. A página Hoje apresenta preparação real do tenant enquanto os módulos financeiros não existem.
+
+Criar tenant, agência, convite e editar perfis/acessos usam drawers com uma acção principal. Permissões editadas por interruptores, sem matriz. Login com identidade do microcrédito; QR para TOTP; erros curtos em português. A pesquisa por Cmd/Ctrl+K permite abrir definições e encontrar membros autorizados da equipa. Marca, segurança e auditoria usam páginas de detalhe simples. Catálogo /design continua exclusivo de desenvolvimento.
