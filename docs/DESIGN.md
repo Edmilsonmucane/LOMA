@@ -45,3 +45,9 @@ Criar tenant, agência, convite e editar perfis/acessos usam drawers com uma ac�
 Lista com nome, modalidade, periodicidade, versão e estado; Criar produto é a acção principal. Criar/editar/consultar num drawer: Condições → Mais opções → Confirmar. Limites, carência, comissões, impostos, penalizações, calendário, imputação, liquidação, requisitos e aprovação usam rótulos em português; perfis mostram o nome editável, não identificadores técnicos.
 
 Simulador mostra prestação, total, custo, desembolso, cobrança inicial e taxa efectiva anual. SAC identifica a primeira prestação; só juros identifica os juros periódicos com capital no fim; bullet identifica pagamento único. Plano mostra datas, capital, juros e prestação, com juros capitalizados quando aplicáveis. Versões anteriores são consultáveis sem edição. Revisão visual em computador e móvel e scans axe do drawer executados; a tabela tem scroll local, sem overflow da página.
+
+## M3 — Clientes
+
+Pesquisa, filtro por lista/agência e Criar cliente acima da tabela; importar é acção secundária. Tabela de nome, contacto, província e estado sem números decorativos. Ficha usa secções com linhas finas, identificação, contactos, morada, actividade, referências, fiadores, consentimento e documentos, seguidas pela linha do tempo. Edição em drawer com básicos à vista e detalhes opcionais recolhidos. Telefone apresentado como +258 84 123 4567; datas com meses pt-MZ do catálogo.
+
+Importação em três passos: escolher CSV → ligar colunas → rever/importar. Contagem real, erros por linha, relatório completo descarregável e explicação de ausência de consentimento. Canais de mensagens por interruptor, origem da autorização junto aos campos. Documentos mostram validade, estado expirado e ajuda sobre ligações temporárias. Estados vazios úteis, carregamento com skeleton, teclado/foco e scans axe da ficha/drawer verificados em computador/móvel.

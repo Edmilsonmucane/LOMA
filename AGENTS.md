@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M2)
+## Comandos (M0–M3)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -21,6 +21,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm db:types (após migrações)
 - pnpm backup:local (dump privado; ver docs/RECOVERY.md)
 - pnpm test:rls (antes de Playwright; usa serviços reais)
+- pnpm test:clients (base/Auth/Storage reais e lote de 500)
 - pnpm dev
 - pnpm typecheck
 - pnpm lint
@@ -41,3 +42,9 @@ Operações de negócio usam cliente Supabase com cookies do utilizador e RLS. S
 ## Produtos e motor (M2)
 
 Ler docs/LOAN_ENGINE.md antes de mudar cálculos. Não converter dinheiro ou taxas para Number. Versões de produto são imutáveis; gravação apenas por save_product, com revisão esperada e autorização. Conflitos usam PT409: SQLSTATE 40001 pode provocar repetição automática no PostgREST. Presets são dados editáveis, não regras jurídicas. Não imprimir argumentos de Server Actions; podem conter palavras-passe ou dados pessoais.
+
+## Clientes (M3)
+
+save_client é a fronteira de escrita, com revisão esperada e chaves normalizadas únicas por tenant. Agência antiga e nova devem estar autorizadas. search_clients valida sessão/permissão e agência uma vez, dentro do RPC, e restringe o tenant explicitamente; não remover essas condições para acelerar a pesquisa. Histórico e consentimento são append-only. Dinheiro fica em colunas bigint geradas a partir dos valores exactos em JSON; ao transportar montantes use as strings exactas do perfil, não números JavaScript vindos do PostgREST.
+
+Documentos usam sessão do utilizador, nunca service-role. Só paths reservados podem receber upload; ficheiros concluídos não são sobrescritos. Conferir bucket privado e políticas por cliente, tenant e agência. Ligações assinadas e traces de navegador são credenciais temporárias/dados privados: não imprimir nem colocar no Git. Antes de build, terminar verificações em dev; build concorrente com Next dev pode deixar o compilador de desenvolvimento preso neste ambiente.

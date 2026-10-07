@@ -89,6 +89,192 @@ export type Database = {
           },
         ];
       };
+      client_documents: {
+        Row: {
+          client_id: string;
+          created_at: string;
+          expires_on: string | null;
+          filename: string;
+          id: string;
+          kind: string;
+          mime_type: string;
+          path: string;
+          size: number;
+          status: string;
+          tenant_id: string;
+          title: string;
+        };
+        Insert: {
+          client_id: string;
+          created_at?: string;
+          expires_on?: string | null;
+          filename: string;
+          id?: string;
+          kind: string;
+          mime_type: string;
+          path: string;
+          size: number;
+          status?: string;
+          tenant_id: string;
+          title: string;
+        };
+        Update: {
+          client_id?: string;
+          created_at?: string;
+          expires_on?: string | null;
+          filename?: string;
+          id?: string;
+          kind?: string;
+          mime_type?: string;
+          path?: string;
+          size?: number;
+          status?: string;
+          tenant_id?: string;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'client_documents_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      client_events: {
+        Row: {
+          actor_id: string | null;
+          actor_name: string | null;
+          client_id: string;
+          created_at: string;
+          detail: Json;
+          id: string;
+          kind: string;
+          tenant_id: string;
+        };
+        Insert: {
+          actor_id?: string | null;
+          actor_name?: string | null;
+          client_id: string;
+          created_at?: string;
+          detail: Json;
+          id?: string;
+          kind: string;
+          tenant_id: string;
+        };
+        Update: {
+          actor_id?: string | null;
+          actor_name?: string | null;
+          client_id?: string;
+          created_at?: string;
+          detail?: Json;
+          id?: string;
+          kind?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'client_events_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      client_keys: {
+        Row: {
+          client_id: string;
+          kind: string;
+          tenant_id: string;
+          value: string;
+        };
+        Insert: {
+          client_id: string;
+          kind: string;
+          tenant_id: string;
+          value: string;
+        };
+        Update: {
+          client_id?: string;
+          kind?: string;
+          tenant_id?: string;
+          value?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'client_keys_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      clients: {
+        Row: {
+          birth_date: string | null;
+          branch_id: string;
+          classification: string;
+          consent: Json;
+          created_at: string;
+          expenses: number | null;
+          id: string;
+          income: number | null;
+          name: string;
+          profile: Json;
+          revision: number;
+          tenant_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          birth_date?: string | null;
+          branch_id: string;
+          classification?: string;
+          consent: Json;
+          created_at?: string;
+          expenses?: number | null;
+          id?: string;
+          income?: number | null;
+          name: string;
+          profile: Json;
+          revision?: number;
+          tenant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          birth_date?: string | null;
+          branch_id?: string;
+          classification?: string;
+          consent?: Json;
+          created_at?: string;
+          expenses?: number | null;
+          id?: string;
+          income?: number | null;
+          name?: string;
+          profile?: Json;
+          revision?: number;
+          tenant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'clients_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'clients_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       memberships: {
         Row: {
           active: boolean;
@@ -445,8 +631,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      add_client_note: {
+        Args: { c: string; note: string; t: string };
+        Returns: string;
+      };
       branch_allowed: { Args: { b: string; t: string }; Returns: boolean };
+      client_allowed: {
+        Args: { c: string; p?: string; t: string };
+        Returns: boolean;
+      };
+      client_object_allowed: {
+        Args: { object_path: string; p: string; upload?: boolean };
+        Returns: boolean;
+      };
+      client_search_text: { Args: { value: string }; Returns: string };
+      complete_client_document: {
+        Args: { did: string; t: string };
+        Returns: boolean;
+      };
       has_permission: { Args: { p: string; t: string }; Returns: boolean };
+      import_clients: { Args: { rows: Json; t: string }; Returns: Json };
       is_platform_admin: { Args: never; Returns: boolean };
       link_existing_member: {
         Args: {
@@ -470,6 +674,29 @@ export type Database = {
         };
         Returns: string;
       };
+      reserve_client_document: {
+        Args: { c: string; document_data: Json; t: string };
+        Returns: {
+          client_id: string;
+          created_at: string;
+          expires_on: string | null;
+          filename: string;
+          id: string;
+          kind: string;
+          mime_type: string;
+          path: string;
+          size: number;
+          status: string;
+          tenant_id: string;
+          title: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'client_documents';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       resolve_tenant: {
         Args: { tenant_slug: string };
         Returns: {
@@ -482,6 +709,15 @@ export type Database = {
           slug: string;
         }[];
       };
+      save_client: {
+        Args: {
+          client_data: Json;
+          expected_revision?: number;
+          selected_client?: string;
+          t: string;
+        };
+        Returns: string;
+      };
       save_product: {
         Args: {
           conditions: Json;
@@ -493,6 +729,37 @@ export type Database = {
         };
         Returns: string;
       };
+      search_clients: {
+        Args: {
+          page_offset?: number;
+          page_size?: number;
+          query?: string;
+          selected_branch?: string;
+          selected_class?: string;
+          t: string;
+        };
+        Returns: {
+          birth_date: string | null;
+          branch_id: string;
+          classification: string;
+          consent: Json;
+          created_at: string;
+          expenses: number | null;
+          id: string;
+          income: number | null;
+          name: string;
+          profile: Json;
+          revision: number;
+          tenant_id: string;
+          updated_at: string;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'clients';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       tenant_session_valid: { Args: { t: string }; Returns: boolean };
       tenant_usage: {
         Args: never;
@@ -500,6 +767,10 @@ export type Database = {
           tenant_id: string;
           user_count: number;
         }[];
+      };
+      valid_client_profile: {
+        Args: { consent: Json; p: Json };
+        Returns: boolean;
       };
       valid_product_terms: { Args: { c: Json }; Returns: boolean };
     };

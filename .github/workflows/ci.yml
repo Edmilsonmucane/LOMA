@@ -15,6 +15,7 @@ jobs:
       - run: pnpm local:env
       - run: pnpm local:seed
       - run: pnpm test:rls
+      - run: pnpm test:clients
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check

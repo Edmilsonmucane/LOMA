@@ -25,4 +25,30 @@ try {
 } finally {
   closeSync(file);
 }
-console.log(`Private local database backup: ${path}`);
+const storagePath = path.replace('.dump', '.storage.tar');
+const storageFile = openSync(storagePath, 'wx', 0o600);
+try {
+  execFileSync(
+    'docker',
+    [
+      'exec',
+      'loma-local-storage-1',
+      'tar',
+      '-C',
+      '/var/lib/storage',
+      '-cf',
+      '-',
+      '.',
+    ],
+    { stdio: ['ignore', storageFile, 'pipe'] },
+  );
+} catch {
+  throw new Error(
+    'Storage backup failed; database dump alone does not contain document files.',
+  );
+} finally {
+  closeSync(storageFile);
+}
+console.log(
+  `Private local database and Storage backups: ${path}, ${storagePath}`,
+);

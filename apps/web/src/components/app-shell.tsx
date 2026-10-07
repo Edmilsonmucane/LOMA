@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -55,6 +55,31 @@ export function AppShell({
   const path = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [clientResults, setClientResults] = useState<
+    { id: string; name: string }[]
+  >([]);
+  useEffect(() => {
+    if (!can(permissions, 'clients.read') || !searchQuery.trim()) return;
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/clients/search?q=${encodeURIComponent(searchQuery)}`,
+          { signal: controller.signal },
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setClientResults(data.clients.slice(0, 10));
+        }
+      } catch {}
+    }, 150);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [searchQuery, permissions]);
+
   const nav = (
     <>
       <nav aria-label={t('navigation')} className="app-nav">
@@ -79,7 +104,11 @@ export function AppShell({
               key={key}
               href={url}
               onClick={() => setMenuOpen(false)}
-              aria-current={path === url ? 'page' : undefined}
+              aria-current={
+                path === url || (url !== '/app' && path.startsWith(`${url}/`))
+                  ? 'page'
+                  : undefined
+              }
             >
               <Icon aria-hidden />
               {t(`nav.${key}`)}
@@ -163,6 +192,10 @@ export function AppShell({
             <strong>{name}</strong>
           </div>
           <CommandPalette
+            onQueryChange={(query) => {
+              setSearchQuery(query);
+              setClientResults([]);
+            }}
             title={t('search')}
             description={t('searchHelp')}
             searchLabel={t('searchHelp')}
@@ -209,6 +242,12 @@ export function AppShell({
                     },
                   ]
                 : []),
+              ...clientResults.map((item) => ({
+                id: `client-${item.id}`,
+                label: item.name,
+                keywords: searchQuery,
+                onSelect: () => router.push(`/app/clients/${item.id}`),
+              })),
               ...searchItems.map((item) => ({
                 id: item.id,
                 label: item.label,

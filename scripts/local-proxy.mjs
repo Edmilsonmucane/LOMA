@@ -1,6 +1,10 @@
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
-const targets = { '/auth/v1': 'auth:9999', '/rest/v1': 'rest:3000' };
+const targets = {
+  '/auth/v1': 'auth:9999',
+  '/rest/v1': 'rest:3000',
+  '/storage/v1': 'storage:5000',
+};
 http
   .createServer((request, response) => {
     if (request.url === '/templates/invite') {

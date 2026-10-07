@@ -279,6 +279,7 @@ export function CommandPalette({
   emptyLabel,
   closeLabel,
   items,
+  onQueryChange,
 }: {
   trigger: ReactNode;
   title: string;
@@ -287,6 +288,7 @@ export function CommandPalette({
   emptyLabel: string;
   closeLabel: string;
   items: CommandItem[];
+  onQueryChange?: (query: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -325,6 +327,7 @@ export function CommandPalette({
       onOpenChange={(value) => {
         setOpen(value);
         setQuery('');
+        onQueryChange?.('');
         setActive(0);
       }}
     >
@@ -363,6 +366,7 @@ export function CommandPalette({
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
+              onQueryChange?.(event.target.value);
               setActive(0);
             }}
             onKeyDown={(event) => {

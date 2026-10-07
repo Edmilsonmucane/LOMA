@@ -10,17 +10,17 @@ const runtime = existsSync(path)
       jwtSecret: randomBytes(32).toString('hex'),
     };
 writeFileSync(path, JSON.stringify(runtime), { mode: 0o600 });
-writeFileSync(
-  '.local/runtime.env',
-  `LOMA_LOCAL_DB_PASSWORD=${runtime.password}\nLOMA_LOCAL_JWT_SECRET=${runtime.jwtSecret}\n`,
-  { mode: 0o600 },
-);
 const encode = (value) =>
   Buffer.from(JSON.stringify(value)).toString('base64url');
 function jwt(role) {
   const value = `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({ iss: 'supabase', role, iat: Math.floor(Date.now() / 1000) - 60, exp: Math.floor(Date.now() / 1000) + 31536000 })}`;
   return `${value}.${createHmac('sha256', runtime.jwtSecret).update(value).digest('base64url')}`;
 }
+writeFileSync(
+  '.local/runtime.env',
+  `LOMA_LOCAL_DB_PASSWORD=${runtime.password}\nLOMA_LOCAL_JWT_SECRET=${runtime.jwtSecret}\nLOMA_LOCAL_ANON_KEY=${jwt('anon')}\nLOMA_LOCAL_SERVICE_KEY=${jwt('service_role')}\n`,
+  { mode: 0o600 },
+);
 try {
   execFileSync(
     'docker',
@@ -34,6 +34,19 @@ try {
       '-d',
     ],
     { stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 20 * 1024 * 1024 },
+  );
+  execFileSync(
+    'docker',
+    [
+      'compose',
+      '--env-file',
+      '.local/runtime.env',
+      '-f',
+      'supabase/compose.local.yml',
+      'restart',
+      'api',
+    ],
+    { stdio: ['ignore', 'pipe', 'pipe'] },
   );
   let ready = false;
   for (let i = 0; i < 120; i++) {
@@ -75,10 +88,23 @@ try {
     }),
     { mode: 0o600 },
   );
+  let storageReady = false;
+  for (let i = 0; i < 120; i++) {
+    try {
+      if ((await fetch('http://127.0.0.1:54321/storage/v1/status')).ok) {
+        storageReady = true;
+        break;
+      }
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  if (!storageReady) throw new Error('Storage startup failed');
   execFileSync(process.execPath, ['scripts/migrate-local.mjs'], {
     stdio: 'inherit',
   });
-  console.log('Local PostgreSQL, Supabase Auth, PostgREST and mail are ready.');
+  console.log(
+    'Local PostgreSQL, Supabase Auth, PostgREST, private Storage and mail are ready.',
+  );
 } catch (error) {
   if (error.stdout || error.stderr)
     writeFileSync(

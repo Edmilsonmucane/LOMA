@@ -42,9 +42,24 @@ Aceite em 7 out 2026 após as verificações abaixo.
 
 Limites: não há ainda clientes, contratos nem registo persistente de pagamentos; o motor fornece cálculos puros para esses marcos. Produtos publicados ainda não são apresentados num site público (M7). A facilidade do assistente foi verificada por fluxo automatizado e revisão, sem ensaio com um gestor real. Produção alojada e restauração do snapshot cloud continuam por validar.
 
+## M3 — Clientes
+
+Aceite em 7 out 2026 após as verificações abaixo.
+
+- Ficha com identificação BI/NUIT/passaporte/DIRE, contactos, morada, actividade/empregador, rendimento e despesas exactos, referências, fiadores, listas VIP/negra, fotografia e documentos com validade. Edição por revisão, duplicados normalizados por tenant e limites por agência na base.
+- Consentimento por canal com origem e histórico anterior/novo; notas e eventos imutáveis com actor/data. Pesquisa por nome sem acentos, telefone/BI/NUIT, filtros, paginação e integração na paleta global. Listas enviam resumo, sem rendimento/referências/consentimento.
+- Assistente CSV com colunas editáveis, montantes exactos, aspas/multilinha, números físicos de linha, pré-visualização e relatório completo. Um lote de 500 passou tanto na base como no navegador; pesquisa na base entre 8 e 12 ms nos ensaios finais. Erros de duplicado, dados inválidos, excesso bigint e agência em falta foram devolvidos por linha sem desfazer os 500 válidos.
+- Supabase Storage oficial, bucket privado, upload por sessão com tamanho/tipo conferidos, reserva e confirmação, sem substituição de ficheiros concluídos, URLs assinadas de 60 segundos. Testes reais verificaram acesso de leitura, bloqueio entre tenants/agências, ausência de URL pública e expiração de URL de teste.
+- 132 testes Vitest passaram; 29 verificações de base/Auth e quatro grupos adicionais de clientes/Storage passaram. Escrita por colaborador com permissão de edição também foi testada: pode editar a própria agência, sem mover ou criar fichas em agência alheia.
+- Suite Playwright completa: 37 passaram, um teste de lote grande em móvel omitido deliberadamente. O mesmo assistente móvel foi testado com linhas válidas/erros; o lote de 500 foi executado no computador. Os sete testes M3 foram repetidos após os ajustes finais e passaram. Axe de ficha/drawer sem violações WCAG AA detectadas, revisão visual desktop/mobile e campos com alvos de toque de 44px.
+- Typecheck, lint, formatação e build passaram. Produção local: login real, lista HTTP 200, ficha/histórico, upload privado e download assinado passaram; /design HTTP 404 e nenhum erro de navegador.
+- Stack isolada com volumes vazios: Auth/Storage prontos e as 16 migrações aplicadas. Backup/restauro em base/pasta temporárias preservou contagens de clientes/documentos/eventos, RLS e bucket privado; SHA-256 dos 16 ficheiros recuperados conferiu com o volume. Só os destinos temporários foram removidos.
+
+Limites: importação é de clientes CSV UTF-8, sem substituir fichas ou inferir consentimento; carteira de créditos antigos exige os módulos financeiros seguintes. Linha do tempo ainda não tem pedidos/pagamentos/mensagens, que não existem. Limpeza de reservas de upload falhadas, exportação/eliminação por retenção e backup automático alojado aguardam os respectivos módulos/configuração de produção. Não foi efectuado ensaio com gestor real. O restauro de snapshot numa tarefa cloud nova continua por validar; os comandos de arranque já guardados continuam a iniciar os serviços acrescentados.
+
 ## Próximos marcos
 
-M3: clientes, documentos, duplicados, consentimento, linha do tempo e importação CSV.
-M4–M8: pedidos, contratos, pagamentos, comunicações, site público, relatórios e acabamento.
+M4: pedidos, aprovação, contrato PDF, snapshot e desembolso.
+M5–M8: pagamentos, caixa, comunicações, site público, relatórios e acabamento.
 
-Isolamento e cobertura do motor estão comprovados. O fluxo financeiro completo e Lighthouse do site público aguardam os respectivos marcos; a plataforma financeira não está concluída.
+Isolamento, documentos privados, importação e cobertura do motor estão comprovados. O fluxo financeiro completo e Lighthouse do site público aguardam os respectivos marcos; a plataforma financeira não está concluída.

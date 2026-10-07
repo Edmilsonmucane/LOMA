@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M2: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes, contratos, pagamentos registados, mensagens e site público entram em M3–M8.
+M0–M3: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Contratos, pagamentos registados, mensagens e site público entram em M4–M8.
 
 ## Instalar e correr
 
@@ -36,18 +36,27 @@ pnpm format:check
 pnpm test
 pnpm test:engine
 pnpm test:rls
+pnpm test:clients
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
 ```
 
+`pnpm test:clients` verifica clientes por tenant/agência, duplicados, versões, consentimento, documentos privados/expiração e um lote de 500 clientes. Cria fixtures num tenant de verificação separado para o lote.
+
 A verificação RLS usa sessões reais do Supabase Auth, PostgreSQL e PostgREST: leitura/escrita entre tenants, restrições de perfil/agência, auditoria, TOTP e validade da sessão. Executá-la antes dos testes do navegador: altera temporariamente a configuração de segurança dos fixtures e repõe-a ao terminar. Playwright testa computador e Pixel 7, criação de tenant, equipa, marca, recusas de acesso e acessibilidade, além de criar/simular/publicar produtos e consultar versões anteriores. `pnpm test:engine` exige cobertura de pelo menos 95% em linhas, funções, instruções e ramos. Chromium existente pode ser usado com `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm test:e2e`.
 
 `pnpm db:types` actualiza os tipos TypeScript a partir do esquema local aplicado; os tipos ficam versionados. Migrações aplicadas têm checksum: criar nova migração em vez de alterar uma já aplicada.
 
+## Clientes e importação
+
+Abra Clientes → Criar cliente ou Importar clientes. O assistente aceita CSV UTF-8 (exportável do Excel), com vírgula ou ponto e vírgula, até 1 000 linhas/2 MB. Faça corresponder nome e telemóvel; os campos opcionais incluem identificação, morada e valores em MT. Montantes como `15 000,00` são convertidos exactamente para centavos. Revise as linhas e descarregue os erros; fichas existentes nunca são substituídas. A importação deixa todos os canais de mensagens sem autorização.
+
+PDF/JPEG/PNG/WebP até 5 MB, com título e validade opcional, ficam no bucket privado `client-documents`. Fotografias usam o mesmo controlo. A consulta gera uma ligação válida por 60 segundos; actualize a ficha para renovar. O limite por agência aplica-se também ao histórico, documentos e pesquisa global. Backups locais agora incluem base e ficheiros; ver docs/RECOVERY.md.
+
 ## Base de dados e produção
 
-O ambiente local usa PostgreSQL 17 e imagens oficiais de Supabase Auth/PostgREST, mais um proxy HTTP mínimo e Mailpit. Não inclui Storage, cron nem o painel Studio: entram com os módulos que deles precisam. O Docker deste sandbox usa vfs; por isso foi evitada a imagem monolítica de PostgreSQL do CLI Supabase.
+O ambiente local usa PostgreSQL 17 e imagens oficiais de Supabase Auth/PostgREST, Storage oficial, mais um proxy HTTP mínimo e Mailpit. Inclui Supabase Storage oficial com backend de ficheiros em volume privado; cron e Studio ainda não são necessários. O Docker deste sandbox usa vfs; por isso foi evitada a imagem monolítica de PostgreSQL do CLI Supabase.
 
 Em produção, usar Supabase alojado e Vercel. Criar variáveis de `.env.example` no ambiente seguro do servidor, configurar o domínio base e wildcard, aplicar `supabase/migrations` e configurar os URLs de convite permitidos no Auth. O modelo de convite está em `supabase/templates/invite.html`; copiar para a configuração de email do projecto. O primeiro super-admin é registado em `platform_admins` por um operador autorizado com acesso administrativo à base, nunca por auto-registo. A chave service-role é exclusiva do servidor e serve apenas os convites após autorização do gestor; as operações do tenant usam a sessão do utilizador e RLS.
 

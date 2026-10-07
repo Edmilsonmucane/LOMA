@@ -53,6 +53,26 @@ services:
       PGRST_DB_SCHEMAS: public
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
+  storage:
+    image: supabase/storage-api:v1.33.0
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      NO_PROXY: localhost,127.0.0.1,db,auth,rest,mail,api,storage
+      no_proxy: localhost,127.0.0.1,db,auth,rest,mail,api,storage
+      ANON_KEY: ${LOMA_LOCAL_ANON_KEY}
+      SERVICE_KEY: ${LOMA_LOCAL_SERVICE_KEY}
+      PGRST_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      FILE_SIZE_LIMIT: 5242880
+      TENANT_ID: loma-local
+      REGION: local
+      GLOBAL_S3_BUCKET: local
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+    volumes:
+      - loma-storage:/var/lib/storage
   mail:
     image: axllent/mailpit:v1.22.3
     ports: ['127.0.0.1:54324:8025']
@@ -65,3 +85,4 @@ services:
       - ./templates/invite.html:/runtime/invite.html:ro
 volumes:
   loma-db:
+  loma-storage:
