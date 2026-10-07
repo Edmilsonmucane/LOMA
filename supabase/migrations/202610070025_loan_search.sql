@@ -1,0 +1,6 @@
+create function public.search_loans(t uuid,query text default '',selected_status text default '',page_offset integer default 0) returns jsonb language plpgsql stable security definer set search_path='' as $$declare result jsonb;begin
+ if not public.has_permission(t,'loans.read') then raise exception 'Access denied' using errcode='42501';end if;
+ select coalesce(jsonb_agg(to_jsonb(x)),'[]') into result from (select l.id,l.status,c.snapshot->>'principal' principal,l.disbursed_on start_date,l.created_at,c.snapshot->'client'->>'name' client_name,c.snapshot->>'productName' product_name from public.loans l join public.contracts c on c.id=l.contract_id and c.tenant_id=l.tenant_id where l.tenant_id=t and public.branch_allowed(t,l.branch_id) and (selected_status='' or l.status=selected_status) and (query='' or strpos(lower(extensions.unaccent(c.snapshot->'client'->>'name')),lower(extensions.unaccent(query)))>0 or strpos(l.id::text,lower(query))>0) order by l.created_at desc,l.id limit 51 offset greatest(0,page_offset)) x;return result;
+end;$$;
+revoke all on function public.search_loans(uuid,text,text,integer) from public,anon;
+grant execute on function public.search_loans(uuid,text,text,integer) to authenticated;

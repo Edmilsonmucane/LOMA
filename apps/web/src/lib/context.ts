@@ -61,6 +61,7 @@ export const getTenantContext = cache(async () => {
         'applications.read',
         'applications.manage',
         'loans.read',
+        'loans.disburse',
         'payments.manage',
         'collections.manage',
         'messages.manage',

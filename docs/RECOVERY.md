@@ -22,7 +22,7 @@ Antes de produção, activar backups automáticos conforme o plano contratado e 
 
 Procedimento: suspender operações → identificar ponto de recuperação → restaurar num projecto separado → confirmar Auth, RLS, auditoria, contagens e, a partir de M5, saldos do razão → testar login e fluxo crítico → mudar as variáveis seguras do servidor → retomar operações. Guardar registo da decisão e do teste. Nunca editar auditoria para ajustar um restauro.
 
-O restauro de um projecto Supabase alojado e a política de backup automática de produção dependem do projecto e plano reais; ainda não foram executados. Storage exige backup separado de objectos e metadados; o backup normal de PostgreSQL alojado não inclui os bytes. Contratos acrescentarão documentos em M4.
+O restauro de um projecto Supabase alojado e a política de backup automática de produção dependem do projecto e plano reais; ainda não foram executados. Storage exige backup separado de objectos e metadados; o backup normal de PostgreSQL alojado não inclui os bytes. No M4, contratos são snapshots na base e PDFs regenerados pelo motor histórico; o dump inclui as condições e modelos aprovados. Preservar também o código do motor v1 para reconstruir os planos. Ficheiros assinados em papel podem ser carregados nos documentos privados do cliente.
 
 ## Documentos — M3
 
@@ -31,3 +31,7 @@ O ficheiro .storage.tar corresponde ao volume /var/lib/storage do Supabase Stora
 Verificação reversível: extrair TAR numa pasta temporária privada, conferir os hashes dos ficheiros contra o volume actual e verificar que um restauro de teste da base conserva bucket privado, políticas storage.objects, clients/client_documents, histórico e chaves. Não restaurar sobre o volume activo para testar. Restauro real: suspender operações/Storage/Auth/PostgREST → backup prévio → restaurar base e ficheiros em destinos separados → conferir referências e permissões → iniciar Storage → testar sessão, URL privada recusada e URL assinada → retomar. Segredos/JWT devem ser preservados ou as sessões devem ser renovadas; ligações assinadas antigas não constituem teste de recuperação.
 
 Verificação M3 executada: dump restaurado numa base temporária, contagens de clientes/documentos/eventos e RLS preservadas, bucket privado; 16 ficheiros do TAR extraído conferidos por SHA-256 contra o volume. Base e pasta temporárias removidas, dados de trabalho intactos.
+
+## Contratos — M4
+
+O dump inclui applications/contracts/loans/application_events, FKs/RLS e auditoria dos acessos ao PDF. Preservar código do motor histórico (engine_version) e dependências/fontes do PDF juntamente com o release. Não recalcular contratos restaurados com uma versão financeira diferente. Conferir contagens, snapshot, versão e plano exacto, além dos documentos privados existentes.

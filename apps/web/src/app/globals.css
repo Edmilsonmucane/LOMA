@@ -1287,3 +1287,60 @@ code {
   align-items: center;
   min-height: 44px;
 }
+
+/* M4: document editing and application state board share the neutral surfaces. */
+.contract-textarea {
+  min-height: 360px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.application-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
+  gap: 24px;
+}
+.application-board h2 {
+  font-size: var(--text-base);
+  margin-bottom: 16px;
+}
+.application-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  margin-bottom: 12px;
+  min-height: 44px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.requirements-list {
+  list-style: none;
+  padding: 0;
+}
+.requirements-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.loan-summary {
+  margin-block: 24px;
+}
+.application-loading {
+  display: grid;
+  gap: var(--space-3);
+}
+.application-row-skeleton {
+  height: 52px;
+}
+.loan-plan-table table {
+  min-width: 800px;
+}
+.loan-plan-table td {
+  white-space: nowrap;
+}

@@ -9,6 +9,152 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      application_events: {
+        Row: {
+          actor_id: string;
+          actor_name: string;
+          application_id: string;
+          branch_id: string;
+          created_at: string;
+          detail: string;
+          id: string;
+          status: string;
+          tenant_id: string;
+        };
+        Insert: {
+          actor_id: string;
+          actor_name: string;
+          application_id: string;
+          branch_id: string;
+          created_at?: string;
+          detail?: string;
+          id?: string;
+          status: string;
+          tenant_id: string;
+        };
+        Update: {
+          actor_id?: string;
+          actor_name?: string;
+          application_id?: string;
+          branch_id?: string;
+          created_at?: string;
+          detail?: string;
+          id?: string;
+          status?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'application_events_application_id_tenant_id_fkey';
+            columns: ['application_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'applications';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'application_events_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      applications: {
+        Row: {
+          branch_id: string;
+          client_id: string;
+          created_at: string;
+          created_by: string;
+          decided_by: string | null;
+          decision_reason: string;
+          guarantees: string[];
+          id: string;
+          opinion: string;
+          periods: number;
+          principal: string;
+          principal_cents: number | null;
+          product_version_id: string;
+          purpose: string;
+          revision: number;
+          start_date: string;
+          status: string;
+          tenant_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          branch_id: string;
+          client_id: string;
+          created_at?: string;
+          created_by: string;
+          decided_by?: string | null;
+          decision_reason?: string;
+          guarantees?: string[];
+          id?: string;
+          opinion?: string;
+          periods: number;
+          principal: string;
+          principal_cents?: number | null;
+          product_version_id: string;
+          purpose: string;
+          revision?: number;
+          start_date: string;
+          status?: string;
+          tenant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          branch_id?: string;
+          client_id?: string;
+          created_at?: string;
+          created_by?: string;
+          decided_by?: string | null;
+          decision_reason?: string;
+          guarantees?: string[];
+          id?: string;
+          opinion?: string;
+          periods?: number;
+          principal?: string;
+          principal_cents?: number | null;
+          product_version_id?: string;
+          purpose?: string;
+          revision?: number;
+          start_date?: string;
+          status?: string;
+          tenant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'applications_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'applications_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'applications_product_version_id_tenant_id_fkey';
+            columns: ['product_version_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'product_versions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'applications_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       audit_events: {
         Row: {
           action: string;
@@ -272,6 +418,114 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'tenants';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      contracts: {
+        Row: {
+          application_id: string;
+          approved_at: string;
+          approved_by: string;
+          branch_id: string;
+          engine_version: number;
+          id: string;
+          principal_cents: number | null;
+          snapshot: Json;
+          tenant_id: string;
+        };
+        Insert: {
+          application_id: string;
+          approved_at?: string;
+          approved_by: string;
+          branch_id: string;
+          engine_version?: number;
+          id?: string;
+          principal_cents?: number | null;
+          snapshot: Json;
+          tenant_id: string;
+        };
+        Update: {
+          application_id?: string;
+          approved_at?: string;
+          approved_by?: string;
+          branch_id?: string;
+          engine_version?: number;
+          id?: string;
+          principal_cents?: number | null;
+          snapshot?: Json;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'contracts_application_id_tenant_id_fkey';
+            columns: ['application_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'applications';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'contracts_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      loans: {
+        Row: {
+          branch_id: string;
+          contract_id: string;
+          created_at: string;
+          disbursed_on: string;
+          id: string;
+          method: string;
+          recorded_by: string;
+          reference: string;
+          signed_on: string;
+          status: string;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          contract_id: string;
+          created_at?: string;
+          disbursed_on: string;
+          id?: string;
+          method: string;
+          recorded_by: string;
+          reference: string;
+          signed_on: string;
+          status?: string;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          contract_id?: string;
+          created_at?: string;
+          disbursed_on?: string;
+          id?: string;
+          method?: string;
+          recorded_by?: string;
+          reference?: string;
+          signed_on?: string;
+          status?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'loans_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'loans_contract_id_tenant_id_fkey';
+            columns: ['contract_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'contracts';
+            referencedColumns: ['id', 'tenant_id'];
           },
         ];
       };
@@ -649,6 +903,18 @@ export type Database = {
         Args: { did: string; t: string };
         Returns: boolean;
       };
+      disburse_application: {
+        Args: {
+          a_id: string;
+          disbursement_date: string;
+          expected_revision: number;
+          payment_method: string;
+          payment_reference: string;
+          signature_date: string;
+          t: string;
+        };
+        Returns: string;
+      };
       has_permission: { Args: { p: string; t: string }; Returns: boolean };
       import_clients: { Args: { rows: Json; t: string }; Returns: Json };
       is_platform_admin: { Args: never; Returns: boolean };
@@ -663,6 +929,10 @@ export type Database = {
         Returns: boolean;
       };
       log_access: { Args: { t: string }; Returns: undefined };
+      log_contract_access: {
+        Args: { c_id: string; t: string };
+        Returns: undefined;
+      };
       log_platform_access: { Args: never; Returns: undefined };
       product_shape: { Args: { c: Json }; Returns: boolean };
       provision_tenant: {
@@ -709,6 +979,15 @@ export type Database = {
           slug: string;
         }[];
       };
+      save_application: {
+        Args: {
+          expected_revision?: number;
+          input: Json;
+          selected_application?: string;
+          t: string;
+        };
+        Returns: string;
+      };
       save_client: {
         Args: {
           client_data: Json;
@@ -728,6 +1007,15 @@ export type Database = {
           t: string;
         };
         Returns: string;
+      };
+      search_applications: {
+        Args: {
+          page_offset?: number;
+          query?: string;
+          selected_status?: string;
+          t: string;
+        };
+        Returns: Json;
       };
       search_clients: {
         Args: {
@@ -760,6 +1048,15 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      search_loans: {
+        Args: {
+          page_offset?: number;
+          query?: string;
+          selected_status?: string;
+          t: string;
+        };
+        Returns: Json;
+      };
       tenant_session_valid: { Args: { t: string }; Returns: boolean };
       tenant_usage: {
         Args: never;
@@ -767,6 +1064,16 @@ export type Database = {
           tenant_id: string;
           user_count: number;
         }[];
+      };
+      transition_application: {
+        Args: {
+          a_id: string;
+          expected_revision: number;
+          next_status: string;
+          note?: string;
+          t: string;
+        };
+        Returns: string;
       };
       valid_client_profile: {
         Args: { consent: Json; p: Json };

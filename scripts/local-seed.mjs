@@ -20,6 +20,8 @@ const accounts = existsSync('.local/accounts.json')
 const definitions = [
   ['platform', 'plataforma@loma.test', 'Administração LOMA'],
   ['manager', 'gestor@demo.loma.test', 'Amélia Mucavele'],
+  ['analyst', 'analista@demo.loma.test', 'Olívia Mondlane'],
+  ['cashier', 'caixa@demo.loma.test', 'Ernesto Chissano'],
   ['reader', 'leitura@demo.loma.test', 'Tomás Nhantumbo'],
   ['collector', 'cobrador@demo.loma.test', 'Celina Macuácua'],
   ['other', 'gestor@beira.loma.test', 'Inácio Sitoe'],
@@ -82,6 +84,8 @@ try {
       ...(slug === 'demo'
         ? [
             ['reader', 'reader'],
+            ['analyst', 'analyst'],
+            ['cashier', 'cashier'],
             ['collector', 'collector'],
           ]
         : []),

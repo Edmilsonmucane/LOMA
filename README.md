@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M3: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Contratos, pagamentos registados, mensagens e site público entram em M4–M8.
+M0–M4: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos registados, mensagens e site público entram em M5–M8.
 
 ## Instalar e correr
 
@@ -88,3 +88,11 @@ Os processos e contentores devem ser iniciados novamente em cada tarefa. Nunca i
 - `docs`: decisões, arquitectura, design, recuperação e progresso.
 
 Leia [AGENTS.md](AGENTS.md) e [docs/DECISIONS.md](docs/DECISIONS.md) antes de desenvolver.
+
+### M4 — Pedido até desembolso
+
+Em **Pedidos**, crie um rascunho com cliente, produto publicado, montante, prazo e data acordada. Submeta, inicie análise e registe o parecer. Outro colaborador, com o perfil de aprovação configurado, decide; quem criou não pode decidir. Os requisitos do produto são verificados na base. Se as condições publicadas mudaram antes da decisão, volte ao rascunho e reveja.
+
+Em **Definições → Mensagens e documentos**, personalize o modelo do contrato. Na aprovação, condições, marca, cliente e modelo ficam copiados num contrato imutável. Descarregue o PDF e recolha a assinatura. O caixa regista o desembolso com referência/método e confirmação da assinatura. A data deve corresponder à acordada; ajustes posteriores exigem novo pedido. O crédito e plano aparecem em **Créditos**. Os pagamentos/recibos/caixa serão acrescentados no M5.
+
+`pnpm test:applications` verifica o fluxo com PostgreSQL/Auth reais, revisões, requisitos, perfis, auto-aprovação, snapshots, concorrência, RLS e agência. Fixtures locais incluem agora analista e caixa, com credenciais privadas em `.local/accounts.json`; não há palavra-passe pública.

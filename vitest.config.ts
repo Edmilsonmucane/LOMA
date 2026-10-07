@@ -9,7 +9,7 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     coverage: {
       provider: 'v8',
-      include: ['packages/loan-engine/src/index.ts'],
+      include: ['packages/loan-engine/src/{index,v1}.ts'],
       thresholds: { statements: 95, branches: 95, functions: 95, lines: 95 },
     },
   },

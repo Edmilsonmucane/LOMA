@@ -51,3 +51,11 @@ Simulador mostra prestação, total, custo, desembolso, cobrança inicial e taxa
 Pesquisa, filtro por lista/agência e Criar cliente acima da tabela; importar é acção secundária. Tabela de nome, contacto, província e estado sem números decorativos. Ficha usa secções com linhas finas, identificação, contactos, morada, actividade, referências, fiadores, consentimento e documentos, seguidas pela linha do tempo. Edição em drawer com básicos à vista e detalhes opcionais recolhidos. Telefone apresentado como +258 84 123 4567; datas com meses pt-MZ do catálogo.
 
 Importação em três passos: escolher CSV → ligar colunas → rever/importar. Contagem real, erros por linha, relatório completo descarregável e explicação de ausência de consentimento. Canais de mensagens por interruptor, origem da autorização junto aos campos. Documentos mostram validade, estado expirado e ajuda sobre ligações temporárias. Estados vazios úteis, carregamento com skeleton, teclado/foco e scans axe da ficha/drawer verificados em computador/móvel.
+
+## M4 — Pedidos e desembolso
+
+Lista com pesquisa por cliente/número, filtro por estado e alternativa quadro; paginação real de 50 e aviso do âmbito do quadro. Ficha com cliente/produto, estado, análise, checklist e plano completo; relação prestação máxima/rendimento, despesas e lista do cliente, sem score inventado. Parecer junto à decisão e explicação quando outro colaborador é necessário. Mais opções reúne rever/cancelar.
+
+Contrato PDF privado, Instrument Sans incorporada, linhas e margens generosas; montantes exactos, taxa efectiva anual e plano paginado. Modelo em linguagem editável pelo gestor; efeito limitado a novas aprovações indicado junto ao formulário. Desembolso num drawer com data contratual, assinatura, método, referência e confirmação do efeito. Estado vazio com próxima acção, skeletons com forma de linhas e foco/teclado dos primitivos existentes.
+
+Validação final M4: revisão visual em produção a 1440px e 390px, PDF e scans axe do pedido/drawer/crédito/modelo em computador/Pixel 7. Plano usa região com foco por teclado e scroll local; dinheiro não quebra entre linhas. Ecrãs encerrados não mostram um painel de acções vazio. O teste do catálogo aguarda a animação de entrada antes de medir contraste, sem mudar o limite AA.

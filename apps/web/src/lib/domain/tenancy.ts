@@ -9,6 +9,7 @@ export const permissionKeys = [
   'applications.read',
   'applications.manage',
   'loans.read',
+  'loans.disburse',
   'payments.manage',
   'collections.manage',
   'messages.manage',

@@ -19,3 +19,7 @@ lateCharges conta atraso desde o dia seguinte ao vencimento, desconta tolerânci
 ## Verificação
 
 pnpm test:engine exige ≥95% em instruções, ramos, funções e linhas. Vectores flat, Price, SAC e mora; cinco métodos, carências, três tratamentos de comissões, impostos por base/vigência, calendários, pagamentos parciais/excedentes, liquidações, TIR e rejeição de entradas inválidas. 3 000 combinações determinísticas verificam soma das prestações, amortização e saldo final. Bigint é testado acima do limite inteiro exacto de Number. Isolamento e versões são verificados separadamente por pnpm test:rls na base/Auth reais.
+
+## Contratos históricos (M4)
+
+O motor desta fase permanece em `src/v1.ts`; `src/index.ts` reexporta a API e fornece `simulateContract(version, input)`. Contratos imutáveis guardam `engine_version=1`, principal/prazo/data/condições. Cálculos históricos são sempre projectados pela versão correspondente, sem aceitar totais do cliente. Uma mudança no comportamento financeiro exige v2 preservando v1. Cobertura inclui o motor financeiro completo v1 e o dispatch histórico. Versão suportada/desconhecida é testada no pacote puro; snapshot e texto são também testados no domínio de contratos.

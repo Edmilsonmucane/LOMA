@@ -89,10 +89,23 @@ test('brand change derives accessible button contrast', async ({ page }) => {
   );
 });
 test('catalogue, drawer and search pass WCAG AA checks', async ({ page }) => {
-  const scan = () =>
-    new AxeBuilder({ page })
+  const scan = async () => {
+    // Measure the usable dialog state, after its finite entry transition finishes.
+    await page.getByRole('dialog').evaluateAll((elements) =>
+      Promise.all(
+        elements
+          .flatMap((element) => element.getAnimations({ subtree: true }))
+          .filter(
+            (animation) =>
+              animation.effect?.getComputedTiming().iterations !== Infinity,
+          )
+          .map((animation) => animation.finished.catch(() => undefined)),
+      ),
+    );
+    return new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();
+  };
   expect((await scan()).violations).toEqual([]);
   await page
     .locator('#panels')

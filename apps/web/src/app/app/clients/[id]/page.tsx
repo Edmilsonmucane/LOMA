@@ -23,6 +23,7 @@ export default async function ClientPage({
   if (!z.uuid().safeParse(id).success) notFound();
   const { db, tenant, permissions } = await requirePermission('clients.read');
   const t = await getTranslations('Clients');
+  const applications = await getTranslations('Applications');
   const { data: client } = await db
     .from('clients')
     .select('*')
@@ -246,6 +247,8 @@ export default async function ClientPage({
         <ol className="client-timeline">
           {(events ?? []).map((event) => {
             const detail = event.detail as {
+              application_id?: string;
+              status?: string;
               note?: string;
               title?: string;
               current?: {
@@ -267,6 +270,13 @@ export default async function ClientPage({
                       {' '}
                       · {event.actor_name || t('recordedByStaff')}
                     </span>
+                  )}
+                  {detail.application_id && detail.status && (
+                    <p>
+                      <Link href={`/app/applications/${detail.application_id}`}>
+                        {applications(`states.${detail.status}`)}
+                      </Link>
+                    </p>
                   )}
                   {detail.note && <p>{detail.note}</p>}
                   {detail.title && <p>{detail.title}</p>}

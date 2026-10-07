@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M3)
+## Comandos (M0–M4)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -22,6 +22,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm backup:local (dump privado; ver docs/RECOVERY.md)
 - pnpm test:rls (antes de Playwright; usa serviços reais)
 - pnpm test:clients (base/Auth/Storage reais e lote de 500)
+- pnpm test:applications (pedidos/contratos/desembolso e RLS reais)
 - pnpm dev
 - pnpm typecheck
 - pnpm lint
@@ -48,3 +49,7 @@ Ler docs/LOAN_ENGINE.md antes de mudar cálculos. Não converter dinheiro ou tax
 save_client é a fronteira de escrita, com revisão esperada e chaves normalizadas únicas por tenant. Agência antiga e nova devem estar autorizadas. search_clients valida sessão/permissão e agência uma vez, dentro do RPC, e restringe o tenant explicitamente; não remover essas condições para acelerar a pesquisa. Histórico e consentimento são append-only. Dinheiro fica em colunas bigint geradas a partir dos valores exactos em JSON; ao transportar montantes use as strings exactas do perfil, não números JavaScript vindos do PostgREST.
 
 Documentos usam sessão do utilizador, nunca service-role. Só paths reservados podem receber upload; ficheiros concluídos não são sobrescritos. Conferir bucket privado e políticas por cliente, tenant e agência. Ligações assinadas e traces de navegador são credenciais temporárias/dados privados: não imprimir nem colocar no Git. Antes de build, terminar verificações em dev; build concorrente com Next dev pode deixar o compilador de desenvolvimento preso neste ambiente.
+
+## Pedidos e contratos (M4)
+
+Decisão/desembolso apenas pelos RPCs autorizados, com revisão e locks. Não permitir auto-aprovação nem modificar contratos/eventos aprovados. Não aceitar um plano financeiro calculado pelo navegador. Contratos usam inputs imutáveis e engine_version; preservar v1 financeiro e introduzir nova versão para mudanças de comportamento. PDF usa snapshot, fonte incorporada e sessão/RLS, sem URLs públicas. A data de desembolso não reescreve vencimentos acordados. Pagamentos, razão e saldos efectivos entram em M5.
