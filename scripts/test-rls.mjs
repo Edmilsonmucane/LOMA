@@ -65,9 +65,9 @@ try {
   originalSecurity = a.security;
   await check('RLS enabled on every business and platform table', async () => {
     const { rows } = await db.query(
-      "select relname,relrowsecurity from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='public' and relkind='r' and relname in ('platform_admins','plans','presets','tenants','branches','tenant_roles','memberships','tenant_configuration','audit_events','platform_audit_events')",
+      "select relname,relrowsecurity from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='public' and relkind='r' and relname in ('platform_admins','plans','presets','tenants','branches','tenant_roles','memberships','tenant_configuration','audit_events','platform_audit_events','products','product_versions')",
     );
-    assert.equal(rows.length, 10);
+    assert.equal(rows.length, 12);
     assert(rows.every((row) => row.relrowsecurity));
   });
   for (const table of [
@@ -77,6 +77,8 @@ try {
     'memberships',
     'tenant_configuration',
     'audit_events',
+    'products',
+    'product_versions',
   ])
     await check(`Tenant A cannot read B: ${table}`, async () => {
       const { data, error } = await actor
@@ -255,6 +257,114 @@ try {
         selected_plan_id: '10000000-0000-4000-8000-000000000001',
       });
       assert.equal(rpc.error?.code, '42501');
+    },
+  );
+  await check(
+    'Product revisions are isolated, immutable and reject stale edits',
+    async () => {
+      const { rows: templates } = await db.query(
+        'select terms from public.product_versions where tenant_id=$1 order by version limit 1',
+        [a.id],
+      );
+      const conditions = templates[0].terms;
+      const created = await actor.rpc('save_product', {
+        t: a.id,
+        product_name: `Produto verificado ${randomUUID().slice(0, 8)}`,
+        conditions,
+        expected_revision: 0,
+        product_status: 'active',
+      });
+      assert(!created.error);
+      const p = created.data;
+      const old = await actor
+        .from('product_versions')
+        .select('*')
+        .eq('product_id', p)
+        .single();
+      assert(!old.error);
+      const changed = { ...conditions, rate: '0.07' };
+      const saved = await actor.rpc('save_product', {
+        t: a.id,
+        selected_product: p,
+        product_name: 'Produto actualizado',
+        conditions: changed,
+        expected_revision: 1,
+        product_status: 'draft',
+      });
+      assert(!saved.error);
+      const head = await actor
+        .from('products')
+        .select('*')
+        .eq('id', p)
+        .single();
+      assert.equal(head.data.revision, 2);
+      assert.equal(head.data.active_version, 1);
+      const previous = await actor
+        .from('product_versions')
+        .select('*')
+        .eq('id', old.data.id)
+        .single();
+      assert.deepEqual(previous.data.terms, old.data.terms);
+      const stale = await actor.rpc('save_product', {
+        t: a.id,
+        selected_product: p,
+        product_name: 'Edição antiga',
+        conditions,
+        expected_revision: 1,
+        product_status: 'active',
+      });
+      assert.equal(stale.error?.code, 'PT409');
+      const cross = await other.rpc('save_product', {
+        t: b.id,
+        selected_product: p,
+        product_name: 'Sem acesso',
+        conditions,
+        expected_revision: 2,
+        product_status: 'active',
+      });
+      assert.equal(cross.error?.code, '42501');
+      const readonly = await reader.rpc('save_product', {
+        t: a.id,
+        product_name: 'Sem acesso',
+        conditions,
+        expected_revision: 0,
+        product_status: 'active',
+      });
+      assert.equal(readonly.error?.code, '42501');
+      const invalid = await actor.rpc('save_product', {
+        t: a.id,
+        product_name: 'Sem regras',
+        conditions: { ...conditions, rate: null },
+        expected_revision: 0,
+        product_status: 'active',
+      });
+      assert.equal(invalid.error?.code, '23514');
+      await assert.rejects(
+        db.query('update public.product_versions set name=$1 where id=$2', [
+          'Alteração',
+          old.data.id,
+        ]),
+        (e) => e.code === '42501',
+      );
+      await assert.rejects(
+        db.query('delete from public.product_versions where id=$1', [
+          old.data.id,
+        ]),
+        (e) => e.code === '42501',
+      );
+      const wrongRole = await actor.rpc('save_product', {
+        t: a.id,
+        product_name: 'Perfil errado',
+        conditions: {
+          ...conditions,
+          approvalLevels: [
+            { upTo: conditions.maxPrincipal, role: 'inexistent' },
+          ],
+        },
+        expected_revision: 0,
+        product_status: 'active',
+      });
+      assert.equal(wrongRole.error?.code, '23514');
     },
   );
   const enrolled = await actor.auth.mfa.enroll({

@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0 e M1: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Produtos, mensagens e site são criados como configuração inicial **não publicada**. O motor e as operações financeiras começam em M2; os módulos futuros indicam esse estado na interface.
+M0–M2: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes, contratos, pagamentos registados, mensagens e site público entram em M3–M8.
 
 ## Instalar e correr
 
@@ -34,13 +34,14 @@ pnpm typecheck
 pnpm lint
 pnpm format:check
 pnpm test
+pnpm test:engine
 pnpm test:rls
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
 ```
 
-A verificação RLS usa sessões reais do Supabase Auth, PostgreSQL e PostgREST: leitura/escrita entre tenants, restrições de perfil/agência, auditoria, TOTP e validade da sessão. Executá-la antes dos testes do navegador: altera temporariamente a configuração de segurança dos fixtures e repõe-a ao terminar. Playwright testa computador e Pixel 7, criação de tenant, equipa, marca, recusas de acesso e acessibilidade. Chromium existente pode ser usado com `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm test:e2e`.
+A verificação RLS usa sessões reais do Supabase Auth, PostgreSQL e PostgREST: leitura/escrita entre tenants, restrições de perfil/agência, auditoria, TOTP e validade da sessão. Executá-la antes dos testes do navegador: altera temporariamente a configuração de segurança dos fixtures e repõe-a ao terminar. Playwright testa computador e Pixel 7, criação de tenant, equipa, marca, recusas de acesso e acessibilidade, além de criar/simular/publicar produtos e consultar versões anteriores. `pnpm test:engine` exige cobertura de pelo menos 95% em linhas, funções, instruções e ramos. Chromium existente pode ser usado com `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm test:e2e`.
 
 `pnpm db:types` actualiza os tipos TypeScript a partir do esquema local aplicado; os tipos ficam versionados. Migrações aplicadas têm checksum: criar nova migração em vez de alterar uma já aplicada.
 
@@ -72,7 +73,7 @@ Os processos e contentores devem ser iniciados novamente em cada tarefa. Nunca i
 
 - `apps/web`: Next.js, aplicação e catálogos de tradução.
 - `packages/ui`: tokens e componentes Radix/Phosphor/TanStack.
-- `packages/loan-engine`: motor puro, reservado para M2.
+- `packages/loan-engine`: motor puro implementado e testado; ver docs/LOAN_ENGINE.md.
 - `supabase`: migrações, stack local e modelo de convite.
 - `scripts`: arranque, bindings locais, fixtures, tipos e teste real de RLS.
 - `docs`: decisões, arquitectura, design, recuperação e progresso.

@@ -39,3 +39,9 @@ Catálogo revisto visualmente a 1440px e 390px. Testes Playwright em computador 
 Barra lateral de 224px, seis módulos principais e dois itens inferiores, filtrados pelas permissões. Em móvel, navegação num drawer e cabeçalho compacto. Conteúdo com linhas finas, espaçamento de 4px, superfícies neutras; marca e contraste derivados da cor do tenant. A página Hoje apresenta preparação real do tenant enquanto os módulos financeiros não existem.
 
 Criar tenant, agência, convite e editar perfis/acessos usam drawers com uma acção principal. Permissões editadas por interruptores, sem matriz. Login com identidade do microcrédito; QR para TOTP; erros curtos em português. A pesquisa por Cmd/Ctrl+K permite abrir definições e encontrar membros autorizados da equipa. Marca, segurança e auditoria usam páginas de detalhe simples. Catálogo /design continua exclusivo de desenvolvimento.
+
+## M2 — Produtos
+
+Lista com nome, modalidade, periodicidade, versão e estado; Criar produto é a acção principal. Criar/editar/consultar num drawer: Condições → Mais opções → Confirmar. Limites, carência, comissões, impostos, penalizações, calendário, imputação, liquidação, requisitos e aprovação usam rótulos em português; perfis mostram o nome editável, não identificadores técnicos.
+
+Simulador mostra prestação, total, custo, desembolso, cobrança inicial e taxa efectiva anual. SAC identifica a primeira prestação; só juros identifica os juros periódicos com capital no fim; bullet identifica pagamento único. Plano mostra datas, capital, juros e prestação, com juros capitalizados quando aplicáveis. Versões anteriores são consultáveis sem edição. Revisão visual em computador e móvel e scans axe do drawer executados; a tabela tem scroll local, sem overflow da página.

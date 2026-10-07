@@ -225,6 +225,95 @@ export type Database = {
         };
         Relationships: [];
       };
+      product_versions: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string;
+          product_id: string;
+          tenant_id: string;
+          terms: Json;
+          version: number;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name: string;
+          product_id: string;
+          tenant_id: string;
+          terms: Json;
+          version: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string;
+          product_id?: string;
+          tenant_id?: string;
+          terms?: Json;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'product_versions_product_id_tenant_id_fkey';
+            columns: ['product_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      products: {
+        Row: {
+          active_version: number | null;
+          created_at: string;
+          id: string;
+          name: string;
+          revision: number;
+          source_key: string | null;
+          status: string;
+          tenant_id: string;
+        };
+        Insert: {
+          active_version?: number | null;
+          created_at?: string;
+          id?: string;
+          name: string;
+          revision?: number;
+          source_key?: string | null;
+          status?: string;
+          tenant_id: string;
+        };
+        Update: {
+          active_version?: number | null;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          revision?: number;
+          source_key?: string | null;
+          status?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'products_id_active_version_tenant_id_fkey';
+            columns: ['id', 'active_version', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'product_versions';
+            referencedColumns: ['product_id', 'version', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'products_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       tenant_configuration: {
         Row: {
           category: string;
@@ -371,6 +460,7 @@ export type Database = {
       };
       log_access: { Args: { t: string }; Returns: undefined };
       log_platform_access: { Args: never; Returns: undefined };
+      product_shape: { Args: { c: Json }; Returns: boolean };
       provision_tenant: {
         Args: {
           preset_id: string;
@@ -392,6 +482,17 @@ export type Database = {
           slug: string;
         }[];
       };
+      save_product: {
+        Args: {
+          conditions: Json;
+          expected_revision: number;
+          product_name: string;
+          product_status: string;
+          selected_product?: string;
+          t: string;
+        };
+        Returns: string;
+      };
       tenant_session_valid: { Args: { t: string }; Returns: boolean };
       tenant_usage: {
         Args: never;
@@ -400,6 +501,7 @@ export type Database = {
           user_count: number;
         }[];
       };
+      valid_product_terms: { Args: { c: Json }; Returns: boolean };
     };
     Enums: {
       [_ in never]: never;

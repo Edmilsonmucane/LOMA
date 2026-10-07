@@ -32,3 +32,17 @@
 - Navegação limita-se aos seis módulos principais mais Relatórios/Definições; itens sem permissão não são mostrados. Pesquisa global em M1 cobre navegação e equipa autorizada. Pesquisa por cliente/BI/NUIT entra com Clientes em M3.
 
 - O proxy de rede do ambiente é injectado nos contentores; NO_PROXY inclui os serviços Docker internos para o Auth obter o modelo português de convite. O callback usa o Host validado para preservar o subdomínio externo, evitando o endereço interno do servidor Next. Ambos verificados no fluxo de aceitação do convite.
+
+## 2026-10-07 — M2
+
+- Motor puro sem UI/base: bigint em centavos, decimal.js com 60 algarismos e arredondamento meio para cima. Nunca converter dinheiro ou taxas para Number; datas ISO sem hora e calendários do produto evitam efeitos de fuso.
+- Taxa guardada como fracção decimal em string. Condições JSON usam strings para centavos, por compatibilidade com transporte/persistência; o motor converte para bigint.
+- Carência acrescenta períodos antes da amortização. Juros capitalizados aparecem explicitamente nos períodos de carência e no custo; o capital de amortização inclui-os. SAC mantém amortização constante sobre esse novo saldo. Ver docs/LOAN_ENGINE.md para invariantes e convenções.
+- Taxa efectiva anual pela TIR com datas reais e ano configurável. Raiz calculada com Decimal, sem aproximação Number. Impostos financiados sobre juros resolvidos até estabilidade ao centavo; uma configuração sem solução convergente é recusada.
+- Produtos têm cabeçalho e versões append-only; edição cria versão nova. Publicação aponta a versão activa, rascunho preserva a anterior. Snapshot do contrato será copiado em M4; não há contratos implementados neste marco.
+- Gravação atómica via save_product, autorização tenant.manage, lock e revisão esperada. RLS nas duas tabelas; sem escrita directa do utilizador; histórico protegido contra UPDATE/DELETE/TRUNCATE e auditado. Perfis de aprovação devem existir no mesmo tenant.
+- Conflito de revisão usa SQLSTATE PT409/HTTP 409. O código 40001 originou tentativas repetidas pelo PostgREST real; uma migração posterior corrigiu-o sem editar migrações aplicadas.
+- Quatro presets materializados em rascunho a partir de dados; o gestor edita os produtos-modelo e pode criar outros por cópia. Taxas sugeridas não constituem regras legais. Impostos e penalizações por confirmar ficam sem cobrança.
+- Assistente em três passos, detalhes avançados recolhidos, simulador sempre ligado ao mesmo motor. Validação Zod e financeira no servidor inclui datas de início futuras de impostos. História abre no mesmo drawer em modo de consulta.
+- Limites técnicos de 1 200 períodos de amortização/carência e 256 iterações para impostos protegem recursos; não são limites comerciais ou regulamentares.
+- Logs de argumentos de Server Actions desactivados no Next 16, incluindo desenvolvimento; o callback de Auth é excluído dos logs de pedidos para proteger códigos de acesso.

@@ -29,9 +29,22 @@ Aceite em 7 out 2026 após as verificações registadas abaixo.
 
 Limites: produção alojada, DNS, entrega externa de convites e recuperação de Supabase alojado não executados. O mínimo adicional de palavra-passe do tenant é aplicado na aplicação; o fornecedor reforça o seu mínimo global. Taxas dos produtos iniciais estão por confirmar e nenhum produto/site/automação é publicado em M1. Storage, cron, dados de clientes e operações de crédito entram nos seus marcos.
 
+## M2 — Motor de crédito e Produtos
+
+Aceite em 7 out 2026 após as verificações abaixo.
+
+- Pacote puro com flat, Price, SAC, só juros e bullet; carência, comissões nos três tratamentos, impostos por vigência/base, calendário editável, mora/multa, cascata, excedente, liquidação antecipada, elegibilidade e TIR anual. Valores bigint/Decimal e diferenças absorvidas no fim.
+- Assistente em três passos com pré-visualização viva do mesmo motor, todas as regras editáveis, quatro presets em dados, publicação/rascunho/arquivo e consulta de histórico. Versões imutáveis, revisão optimista, auditoria e RLS nas duas tabelas adicionais.
+- 117 testes Vitest passaram, incluindo 88 do motor, quatro vectores obrigatórios e 3 000 combinações determinísticas. Cobertura: instruções 98,15%; ramos 98,38%; funções 100%; linhas 99,28%. CI exige pelo menos 95% em cada dimensão.
+- 25 verificações na base/Auth reais passaram: isolamento, escrita autorizada, imutabilidade, versão publicada preservada ao guardar rascunho, conflito HTTP 409, dados inválidos e perfis de outro tenant. Criação de tenant continua a provisionar os produtos em rascunho.
+- Suite Playwright completa: 30 testes passaram; os seis testes M2 foram repetidos após a revisão final e passaram em computador/Pixel 7. Criação, simulação, publicação, nova versão, histórico e acesso de leitura verificados. Scans axe do drawer sem violações WCAG AA detectadas, sem overflow da página; revisão visual executada.
+- Typecheck, lint, formatação e build de produção passaram. Em produção local: login real, produtos HTTP 200, simulação flat correcta, nenhum erro de navegador e /design HTTP 404. Documentação, comandos e CI actualizados.
+
+Limites: não há ainda clientes, contratos nem registo persistente de pagamentos; o motor fornece cálculos puros para esses marcos. Produtos publicados ainda não são apresentados num site público (M7). A facilidade do assistente foi verificada por fluxo automatizado e revisão, sem ensaio com um gestor real. Produção alojada e restauração do snapshot cloud continuam por validar.
+
 ## Próximos marcos
 
-M2: motor financeiro, vectores obrigatórios, presets e produtos versionados.
-M3–M8: clientes, pedidos, pagamentos, comunicações, site público, relatórios e acabamento.
+M3: clientes, documentos, duplicados, consentimento, linha do tempo e importação CSV.
+M4–M8: pedidos, contratos, pagamentos, comunicações, site público, relatórios e acabamento.
 
-O isolamento entre tenants está provado por testes reais em M1. Cobertura do motor, fluxo financeiro completo e Lighthouse do site público pertencem a M2–M8 e ainda não foram executados. A plataforma financeira não está concluída.
+Isolamento e cobertura do motor estão comprovados. O fluxo financeiro completo e Lighthouse do site público aguardam os respectivos marcos; a plataforma financeira não está concluída.

@@ -21,7 +21,8 @@
     "local:seed": "node scripts/local-seed.mjs",
     "db:types": "node scripts/database-types.mjs",
     "test:rls": "node scripts/test-rls.mjs",
-    "backup:local": "node scripts/backup-local.mjs"
+    "backup:local": "node scripts/backup-local.mjs",
+    "test:engine": "vitest run packages/loan-engine --coverage"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

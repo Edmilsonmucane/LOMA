@@ -18,10 +18,10 @@ export default async function TodayPage() {
         .eq('tenant_id', tenant.id)
         .eq('active', true),
       db
-        .from('tenant_configuration')
+        .from('products')
         .select('id', { count: 'exact', head: true })
         .eq('tenant_id', tenant.id)
-        .eq('category', 'product'),
+        .eq('status', 'draft'),
     ]);
   return (
     <>
@@ -85,7 +85,11 @@ export default async function TodayPage() {
             <strong>{t('products')}</strong>
             <p>{t('productsHelp')}</p>
           </span>
-          <Badge>{t('notPublished')}</Badge>
+          {can(permissions, 'tenant.manage') ? (
+            <Link href="/app/settings/products">{t('review')}</Link>
+          ) : (
+            <Badge>{t('managerTask')}</Badge>
+          )}
         </div>
       </section>
       <p className="ui-help initial-note">{t('initialNote')}</p>

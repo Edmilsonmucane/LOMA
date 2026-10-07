@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M1)
+## Comandos (M0–M2)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -25,6 +25,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm typecheck
 - pnpm lint
 - pnpm test
+- pnpm test:engine (cobertura mínima de 95%)
 - pnpm test:e2e
 - pnpm build
 - pnpm format:check
@@ -36,3 +37,7 @@ Ler docs/DECISIONS.md, docs/ARCHITECTURE.md e docs/DESIGN.md antes de alteraçõ
 ## Segurança de M1
 
 Operações de negócio usam cliente Supabase com cookies do utilizador e RLS. Service-role apenas para convites já autorizados; nunca para contornar políticas. Helpers SQL com search_path vazio; índices e chaves estrangeiras compostas com tenant_id. Não alterar migrações já aplicadas. .local e .env.local são privados, nunca imprimir os seus valores.
+
+## Produtos e motor (M2)
+
+Ler docs/LOAN_ENGINE.md antes de mudar cálculos. Não converter dinheiro ou taxas para Number. Versões de produto são imutáveis; gravação apenas por save_product, com revisão esperada e autorização. Conflitos usam PT409: SQLSTATE 40001 pode provocar repetição automática no PostgREST. Presets são dados editáveis, não regras jurídicas. Não imprimir argumentos de Server Actions; podem conter palavras-passe ou dados pessoais.
