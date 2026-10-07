@@ -1,0 +1,35 @@
+# Sistema de design LOMA
+
+## Intenção
+
+Calma, precisão e confiança. Espaço negativo, linhas discretas, hierarquia tipográfica; nenhuma decoração sem função.
+
+## Tokens
+
+Papel #F6F5F2; superfície #FFFFFF; tinta #15171A; secundário #6B6F76; linha #E7E5E0; marca inicial #0E5A4A; erro/atraso #B4452F. Cor de marca editável, com foreground contrastante e hover/fundo suave derivados. Tokens semânticos preparados para futura variante escura, sem activar modo escuro em M0.
+
+Instrument Sans na interface, Newsreader nos títulos editoriais públicos. Escala 12/13/14/16/20/28/40 px. Títulos 600, tracking apertado; números tabulares em dinheiro/datas/tabelas. Grelha 4px; cartões 8px, campos 6px; pílula apenas em etiquetas. Linhas 1px, sombras apenas em superfícies flutuantes.
+
+## Componentes e estados
+
+Botões (primário/secundário/discreto/perigo; hover/foco/desactivado/a carregar); campos com rótulo, ajuda e erro; tabela normal/compacta; drawer; etiquetas de estado; tabs; paleta de comandos; skeleton; estado vazio e erro recuperável. Radix fornece semântica e gestão de foco. Phosphor regular é a única família de ícones. Alvos interactivos >=44px, teclado e foco visível. Movimento funcional 160ms ease-out, desactivado em prefers-reduced-motion.
+
+## Estrutura futura
+
+Sidebar: Hoje, Clientes, Pedidos, Créditos, Cobranças, Mensagens; Relatórios e Definições no fundo. Criar/editar em drawers; uma acção principal por ecrã; Ctrl/Cmd+K abre pesquisa. Mobile utilizável, site público mobile-first.
+
+## Texto
+
+pt-MZ, frases curtas, verbos directos, sem emojis/jargão. Dinheiro `10 000,00 MT`, data `7 out 2026`, telefone `+258 84 123 4567`. Todo o conteúdo vem de catálogos de tradução. Demonstrações moçambicanas, identificadas como tal.
+
+## Proibições
+
+Sem gradientes, vidro, manchas desfocadas, sombras repetidas, ícones em círculos coloridos, cartões com bordas laterais coloridas, ilustrações genéricas, contadores animados ou copy promocional genérica.
+
+## Catálogo
+
+/design apenas em desenvolvimento demonstra variantes, estados e interacções. Validar teclado, foco, mobile e contraste. Temas públicos Clássico/Moderno e scoring ficam nos seus marcos.
+
+## Validação M0
+
+Catálogo revisto visualmente a 1440px e 390px. Testes Playwright em computador e Pixel 7 verificam ausência de overflow da página, foco/restauração do drawer, pesquisa e estados vazios, tabs, densidade, marca e reduced motion. Scans axe WCAG AA passaram nos três contextos (catálogo, drawer, pesquisa). Estados desactivados distinguem-se visualmente; elementos icon-only têm nomes acessíveis. A tabela mantém scroll local em ecrãs estreitos. Avaliação com leitor de ecrã real e metas Lighthouse do site público pertencem ao acabamento dos respectivos marcos.
