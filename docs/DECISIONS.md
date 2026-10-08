@@ -102,3 +102,23 @@
 - Playwright: 49 passaram, um omitido (500 em móvel, repetido em computador). M4/M5 repetidos com 12 verdes depois do ajuste de tabelas e acções; seis M5 novamente com a apresentação final de dinheiro. Scans axe e layout móvel sem violações detectadas.
 - Base vazia: 39 migrações, 28 tabelas públicas com RLS. Produção local final: login, Hoje/saldo/preview, PDF privado/QR, caixa/modelos e 390px; catálogo recusado, sem erros de navegador. Fonte incluída no trace; nenhum segredo financeiro nos assets do cliente.
 - Próximo marco M6. Arranque cloud guardado em rascunho, sem publicação/deploy alojado; limites e procedimentos registados em PROGRESS.md/RECOVERY.md.
+
+## M6 — comunicação e cobranças
+
+- Escritas do pessoal continuam por sessão/RLS e RPC. Actividades de cobrança são append-only; atribuição e metas são dados editáveis. Escalões são configuração do tenant, distintos do score M8.
+- Fila persistente com chave idempotente, tentativas, agendamento, custo em centavos e eventos imutáveis. O worker técnico não expõe uma rota pública nem aceita SQL/payloads do navegador. Revalida consentimento, bloqueio de canal, contacto, limite e horário em cada tentativa; serializa por tenant e cliente.
+- Regras, modelos, horário e frequência são dados editáveis. Automações vêm desligadas; activar não envia acontecimentos antigos. Lembretes usam vencimentos e saldos reais após a tarefa financeira. Campanhas têm pré-visualização e contagem, mas destinatários são novamente filtrados no envio.
+- Credenciais cifradas com chave técnica separada em esquema privado; nunca são devolvidas ao pessoal. Provedor console funciona sem contas pagas. Integrações HTTP usam HTTPS, sem redireccionamentos e com defesa contra endereços privados. Aceitação pelo provedor e entrega confirmada são estados distintos.
+- Leads manuais neste marco; captura pública fica em M7. Segmentos de risco só usam classificação registada, sem inventar score antes de M8. Nenhuma mensagem real externa será usada na validação.
+
+- O início do despacho é confirmado numa transacção separada antes da rede. A segunda transacção revalida o contexto e fixa o contacto actual sob lock. Tentativas incertas reservam frequência/limite, sem reenvio automático; apenas rejeições explícitas libertam a reserva para retry. O papel NOLOGIN loma_message_worker pode executar os helpers e actualizar o estado técnico permitido, mas não ler clientes, chave/ciphertext ou escrever operações financeiras. A identidade LOGIN de produção fica a cargo do operador.
+- Modelos com valor/número financeiro exigem crédito ou acontecimento real. Mensagens gerais/campanhas não fabricam valores de zero; a pré-visualização no servidor usa o mesmo contexto da fila e inclui a instrução de saída. A atribuição de cobrador redefine a data inicial da meta, indicada na interface; recebimentos e estornos são somados exactamente desde essa data.
+
+### Validação M6 — 8 out 2026
+
+- Typecheck, lint, formatação, build e instalação congelada verdes. 165 testes unitários; motor v1 intacto, 90 testes e todas as dimensões de cobertura acima de 95%.
+- 42 verificações Auth/RLS, quatro grupos Clientes/Storage/500, 12 de Pedidos, 15 de Pagamentos e 14 de Comunicações passaram. Testado o papel técnico restrito, custos bigint, cifra e ausência de leitura pública de credenciais, consentimento/SAIR, callbacks assinados, idempotência, retry/incerteza, campanhas, metas e estornos.
+- Lembretes configurados −3/0/1/7/15 dias executados pelo console com valor real e chave única; automações de recibo/decisão verificadas. Worker automático local processou a fila. Aceitação não foi confundida com entrega externa.
+- Playwright completo: 57 passaram e um omitido (500 linhas em móvel, lote validado em computador). Os oito testes M6 foram repetidos após os ajustes finais; axe, teclado e ausência de overflow a 390px verificados.
+- Base vazia: 68 migrações, 34 tabelas públicas com RLS e protecção adicional do esquema privado. Produção local final com login, Hoje, cobranças/drawers, preview financeiro/campanha, todas as rotas M6, linha do tempo e catálogo recusado; nenhum erro de navegador.
+- Arranque cloud actualizado e guardado em rascunho, sem publicação/deploy. M7/M8, entrega externa, restauro cloud e ensaio com gestor real permanecem por validar; limites em PROGRESS.md/COMMUNICATIONS.md.

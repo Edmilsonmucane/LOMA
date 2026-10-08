@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M5: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Mensagens, site público e acabamento entram em M6–M8.
+M0–M6: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Cobranças, modelos, automações, campanhas e contactos interessados usam dados reais; envios têm consentimento, horário e custos auditáveis. Site público e acabamento entram em M7–M8.
 
 ## Instalar e correr
 
@@ -39,6 +39,7 @@ pnpm test:rls
 pnpm test:clients
 pnpm test:applications
 pnpm test:payments
+pnpm test:messages
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
@@ -95,7 +96,7 @@ Leia [AGENTS.md](AGENTS.md) e [docs/DECISIONS.md](docs/DECISIONS.md) antes de de
 
 Em **Pedidos**, crie um rascunho com cliente, produto publicado, montante, prazo e data acordada. Submeta, inicie análise e registe o parecer. Outro colaborador, com o perfil de aprovação configurado, decide; quem criou não pode decidir. Os requisitos do produto são verificados na base. Se as condições publicadas mudaram antes da decisão, volte ao rascunho e reveja.
 
-Em **Definições → Mensagens e documentos**, personalize o modelo do contrato. Na aprovação, condições, marca, cliente e modelo ficam copiados num contrato imutável. Descarregue o PDF e recolha a assinatura. O caixa regista o desembolso com referência/método e confirmação da assinatura. A data deve corresponder à acordada; ajustes posteriores exigem novo pedido. O crédito e plano aparecem em **Créditos**. Os pagamentos/recibos/caixa serão acrescentados no M5.
+Em **Definições → Mensagens e documentos**, personalize o modelo do contrato. Na aprovação, condições, marca, cliente e modelo ficam copiados num contrato imutável. Descarregue o PDF e recolha a assinatura. O caixa regista o desembolso com referência/método e confirmação da assinatura. A data deve corresponder à acordada; ajustes posteriores exigem novo pedido. O crédito e plano aparecem em **Créditos**. Pagamentos, recibos e caixa estão disponíveis no M5.
 
 `pnpm test:applications` verifica o fluxo com PostgreSQL/Auth reais, revisões, requisitos, perfis, auto-aprovação, snapshots, concorrência, RLS e agência. Fixtures locais incluem agora analista e caixa, com credenciais privadas em `.local/accounts.json`; não há palavra-passe pública.
 
@@ -109,4 +110,16 @@ Hoje → Ver caixa → escolher agência. Abrir com numerário contado; registar
 
 `pnpm test:payments` executa após `pnpm test:applications` e verifica base/Auth reais, numeração sem lacunas, pagamentos concorrentes, mora, excedentes, estornos, seis métodos, caixa, task automática e soma do razão/carteira. Os oito novos conjuntos de dados têm RLS; não há escrita financeira directa.
 
-O worker local corre com `pnpm services:start` e processa datas pendentes de forma idempotente. Supabase usa pg_cron, quando disponível, com tarefa a cada 15 minutos; o cálculo continua diário, por data civil. `pnpm backfill:local` inicializa uma vez os planos anteriores ao M5, sem apagar dados. Chave de atestação, preparação de produção e recuperação estão em docs/RECOVERY.md. Lembretes automáticos pertencem ao M6; nenhum envio fictício é apresentado no M5.
+O worker local corre com `pnpm services:start` e processa datas pendentes de forma idempotente. Supabase usa pg_cron, quando disponível, com tarefa a cada 15 minutos; o cálculo continua diário, por data civil. `pnpm backfill:local` inicializa uma vez os planos anteriores ao M5, sem apagar dados. Chave de atestação, preparação de produção e recuperação estão em docs/RECOVERY.md. O M6 acrescenta um worker de mensagens e lembretes configuráveis.
+
+## Cobranças e mensagens — M6
+
+Abra **Cobranças** para ligar, enviar lembrete ou registar contacto, promessa/data/valor e visita. O gestor pode atribuir cobrador e meta por crédito. Escalões de atraso são editáveis em **Definições → Regras de comunicação**. A lista tem pesquisa, filtros por escalão/carteira própria e até 100 resultados por prioridade; mensagens/contactos mostram os 50 registos mais recentes.
+
+Em **Mensagens**, personalize modelos, active automações e crie campanhas com pré-visualização/contagem antes de enviar ou agendar. Sem consentimento não há envio; o opt-out é confirmado novamente no despacho. Na ficha do cliente, **Autorização de mensagens** bloqueia um canal ou regista a nova autorização explícita. Uma importação não cria consentimento. Contactos interessados só convertem com pedidos reais; a captura pública entra no M7 e o score no M8.
+
+`pnpm services:start` inicia também o worker de mensagens; `pnpm messages:run` processa uma passagem e `pnpm messages:watch` inicia um processo contínuo. Não iniciar um segundo watch desnecessário. Sem contas pagas, console imprime mensagens **nos logs privados do worker**, sem enviar SMS/email reais. HTTP SMS/email e WhatsApp Cloud configuram-se em **Definições → Integrações**; credenciais cifradas nunca são devolvidas. WhatsApp exige modelo aprovado e ordem correcta das variáveis, incluindo a instrução para sair.
+
+`pnpm test:messages` usa PostgreSQL/Auth/RLS reais e mocks/console, após test:applications; pausa e retoma apenas o worker local de mensagens para ensaios determinísticos. Verifica dias, consentimento, campanhas, assinatura de callbacks, opt-out, janela/frequência, repetição/custos exactos, promessas, leads e isolamento. Nunca imprime credenciais ou mensagens com dados pessoais no relatório.
+
+Provedores confirmam entrega em `/api/message-webhooks/{tenant_id}/{channel}`. HTTP assina os bytes JSON com HMAC SHA-256 (hex) no cabeçalho `x-loma-signature`: `{id,status:"delivered"|"failed"}` ou `{from,message:"SAIR"}`. WhatsApp usa `x-hub-signature-256`, App Secret e verificação Meta com verifyToken. Configure estes segredos em Integrações. Respostas repetidas não duplicam eventos. Uma resposta incerta exige conferência no provedor; não é reenviada automaticamente.

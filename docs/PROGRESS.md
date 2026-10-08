@@ -59,11 +59,10 @@ Limites: importação é de clientes CSV UTF-8, sem substituir fichas ou inferir
 
 ## Próximos marcos
 
-M6: cobranças, mensagens, automações e campanhas.
 M7: site público e área do cliente.
 M8: relatórios, scoring, demonstração e acabamento.
 
-Isolamento, documentos privados, importação e cobertura do motor estão comprovados. Mensagens, site público e o fluxo completo desde o cliente aguardam M6–M8; a Fase 1 ainda não está concluída.
+Isolamento, documentos privados, importação, cobertura do motor e comunicação estão comprovados. Site público e fluxo completo desde o cliente aguardam M7–M8; a Fase 1 ainda não está concluída.
 
 ## M4 — Pedidos e contratos
 
@@ -86,3 +85,19 @@ Aceite em 8 out 2026 após as verificações abaixo.
 - Produção local final: login real, Hoje, saldo/preview, recibo PDF privado com QR, caixa/modelos e móvel 390px; /design 404, sem erros de navegador. Fonte PDF traçada para deploy; chave financeira ausente dos assets do cliente. Texto do recibo/valor e imagem QR conferidos; revisão visual desktop/mobile, valores sem quebra e acções com espaço.
 
 Limites: não foi publicado um deploy alojado nem validada restauração numa nova tarefa cloud. pg_cron, chave do servidor, backfill e backup de produção estão documentados; a execução verificada é local. O arranque cloud foi guardado em rascunho e precisa de revisão/gravação/publicação nas definições. Registos retroactivos não estão activos; pagamentos/estornos usam a data efectiva actual. Mensagens/cobranças M6, site/cliente M7 e relatórios/scoring/demonstração M8 permanecem por entregar. Não foi efectuado um ensaio com gestor real.
+
+## M6 — Cobranças, mensagens e campanhas
+
+Aceite em 8 out 2026 após as verificações abaixo.
+
+- Cobranças com prioridade por atraso, escalões editáveis, pesquisa e carteira própria. Contactos, promessas, visitas e conclusões são imutáveis; atribuição por agência e metas por cobrador mostram recebimentos exactos desde a atribuição, excluindo estornos.
+- Modelos editáveis, pré-visualização com valores reais, automações desligadas por defeito e histórico na ficha. Lembretes usam vencimentos e saldos do M5; recibos, pedidos, decisões e desembolsos usam acontecimentos posteriores à activação. Custos atravessam APIs como strings de centavos.
+- Campanhas com filtros, contagem/texto antes de confirmar, agendamento e cancelamento. Consentimento, opt-out, acesso/agência, horário, frequência e limite do plano são novamente verificados no despacho. Contactos interessados têm origem, estado e vínculo a cliente; conversão exige pedidos reais, sem inferir consentimento.
+- Fila persistente, idempotência, repetição após rejeição explícita e estados distintos de aceitação/entrega/incerteza. Credenciais cifradas em esquema privado com RLS, callbacks HMAC e deduplicação; HTTPS com DNS público fixado, sem destinos privados/redireccionamentos. Papel técnico restrito testado; nenhuma operação do pessoal usa essa ligação.
+- Typecheck, lint, formatação, build e instalação congelada passaram. 165 testes unitários em 12 ficheiros; motor histórico v1 preservado, 90 testes e cobertura de 98,17% instruções / 98,39% ramos / 100% funções / 99,28% linhas, incluindo 3 000 combinações.
+- Base/Auth reais: 42 verificações RLS, quatro grupos clientes/Storage/500 linhas, 12 de pedidos, 15 de pagamentos e 14 de comunicação. Incluem consentimento em dois momentos, isolamento de agência/tenant, cifra, callbacks, opt-out persistente, janela/frequência, custo acima do limite exacto de Number, retry/incerteza, campanhas e metas/estornos. Os lembretes −3/0/1/7/15 dias foram executados via ConsoleProvider; o contentor automático também aceitou uma mensagem de teste.
+- Playwright completo: 57 passaram, um omitido (lote de 500 repetido em móvel). Os oito M6 passaram novamente após os ajustes funcionais e visuais: cobrança/promessa, lembrete, campanha, modelos, leads, configuração, leitura sem escrita, axe e layout móvel.
+- Stack temporária vazia: 68 migrações e 34 tabelas públicas com RLS; tabelas privadas de integração também protegidas. Arranque/seed repetidos preservaram volumes; só recursos temporários de verificação foram removidos.
+- Produção local final: login real, quatro números de Hoje, cobrança e lembrete de 10 000,00 MT, promessa com campos de 44px, todas as rotas M6, pré-visualização de campanha autorizada, linha do tempo, móvel 390px e /design HTTP 404. Sem erros de navegador nem envio externo; revisão visual concluída.
+
+Limites: console confirma o processamento de desenvolvimento, não a recepção num telemóvel. Provedores externos, deploy alojado, identidade LOGIN técnica de produção e restauro numa nova tarefa cloud não foram executados. Envios incertos exigem conferência; interrupções que atravessam uma data de lembrete exigem revisão operacional. Operação/recuperação em COMMUNICATIONS.md e RECOVERY.md. Arranque cloud M6 guardado em rascunho: rever, guardar e publicar nas definições. M7 (site/cliente) e M8 (relatórios/scoring/demonstração) continuam pendentes; não houve ensaio com gestor real.

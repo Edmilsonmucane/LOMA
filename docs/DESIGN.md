@@ -67,3 +67,13 @@ Hoje tem quatro números reais, sem gráficos; lista ordenada por vencimento com
 Saldo, saldo a favor e prestações por pagar dominam o detalhe do crédito; plano original fica em disclosure e contrato privado. Extracto mantém recibos estornados. Caixa usa contagem de numerário e diferença viva, motivo quando necessário. Tabelas têm scroll local, alvos de 44px, foco e rótulos. Fluxos de pagamentos/caixa foram verificados por teclado/axe e a 390px.
 
 Saldos importantes usam 28px e MT menor/secundário, sem perder o formato exacto. Acções agrupadas têm 12px de espaço. Prestações e caixa preservam dinheiro/datas numa linha com scroll local; revisão final em produção a 1440/390px.
+
+## M6 — cobrança e comunicação
+
+Cobranças são linhas por prioridade de vencimento, com atraso/valor, nota recente e acções directas. Registar contacto abre drawer para contacto, promessa com data/valor, visita ou conclusão. Atribuição/meta ficam em Mais opções. Escalões e carteira própria são filtros simples; nenhum gráfico ou nova entrada principal no menu.
+
+Mensagens mostra texto, canal, custo exacto, tentativas, resultado e motivo legível. Aceite pelo provedor e Entrega confirmada têm rótulos distintos; envios incertos pedem conferência, sem apresentar zero como custo conhecido. Modelos/automações/campanhas/contactos interessados são navegação secundária. Modelos não exigem identificadores técnicos; associação de lead procura o cliente pelo nome. Campanha confere destinatários e texto antes da confirmação. Consentimento e horário são explicados junto à acção.
+
+Configuração usa campos com rótulos, interruptores e estados de confirmação. Credenciais nunca reaparecem e são apagadas do formulário após guardar. Loading mantém a forma das linhas; erro permite tentar de novo. Listas quebram texto e agrupam acções a 390px, sem sombras ou decoração; drawers usam os primitivos acessíveis existentes.
+
+Validação M6: oito fluxos Playwright em computador/Pixel 7, scans axe e revisão visual em produção local a 1440/390px. Selects e interruptores têm alvos de pelo menos 44px; custos, metas e inputs monetários usam números tabulares. Pré-visualização de lembrete mostra prestação real e saída; campanha mostra apenas destinatários autorizados e texto antes de confirmar. Nenhum overflow da página ou erro de navegador detectado. Sem ensaio de usabilidade com gestor real.

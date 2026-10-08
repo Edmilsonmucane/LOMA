@@ -84,6 +84,15 @@ services:
       PGPASSWORD: ${LOMA_LOCAL_DB_PASSWORD}
     command: ['sh', '/runtime/daily.sh']
     volumes: ['../scripts/daily-local.sh:/runtime/daily.sh:ro']
+  messages:
+    image: node:24-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    working_dir: /workspace/LOMA
+    environment:
+      COMMUNICATION_DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+    command: ['node', 'scripts/message-worker.mjs', '--watch']
+    volumes: ['../:/workspace/LOMA:ro']
   mail:
     image: axllent/mailpit:v1.22.3
     ports: ['127.0.0.1:54324:8025']

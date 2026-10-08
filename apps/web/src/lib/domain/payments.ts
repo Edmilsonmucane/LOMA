@@ -114,6 +114,7 @@ export const todaySchema = z.object({
   attention: z.array(
     z.object({
       id: z.uuid(),
+      client_id: z.uuid(),
       name: z.string(),
       due_date: z.iso.date(),
       phone: z.string().nullable(),

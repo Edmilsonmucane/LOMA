@@ -1,0 +1,10 @@
+create function public.preview_message(t uuid,c uuid,ch text,template text,loan uuid default null) returns jsonb language plpgsql stable security definer set search_path='' as $$declare extra jsonb:='{}';v jsonb;tpl jsonb;body text;k text;begin
+ if not public.client_allowed(t,c,'messages.manage') and not (loan is not null and public.client_allowed(t,c,'collections.manage')) then raise exception 'Access denied' using errcode='42501';end if;
+ if ch not in ('sms','whatsapp','email') then raise exception 'Invalid channel' using errcode='23514';end if;
+ if loan is not null then select jsonb_build_object('valor',communication_private.money(coalesce(sum(i.principal+i.interest+i.fine+i.late_interest),0)::bigint),'data',to_char(min(i.due_date),'DD/MM/YYYY'),'numero',left(loan::text,8)) into extra from public.loans l join public.contracts ct on ct.id=l.contract_id and ct.tenant_id=t join public.applications a on a.id=ct.application_id and a.tenant_id=t join public.loan_instalments i on i.loan_id=l.id and i.tenant_id=t where l.id=loan and l.tenant_id=t and a.client_id=c and public.branch_allowed(t,l.branch_id) and i.due_date=(select min(ii.due_date) from public.loan_instalments ii where ii.loan_id=loan and ii.tenant_id=t and ii.principal+ii.interest+ii.fine+ii.late_interest>0) having count(*)>0;if extra is null then raise exception 'Invalid loan' using errcode='23514';end if;end if;
+ select value into tpl from public.tenant_configuration where tenant_id=t and category='message_template' and key=template;if tpl is null then raise exception 'Invalid template' using errcode='23514';end if;
+ v:=communication_private.variables(t,c,extra);body:=tpl->>'body';for k in select jsonb_object_keys(v) loop body:=replace(body,'{'||k||'}',v->>k);end loop;
+ return jsonb_build_object('body',body||E'\n'||(communication_private.rules(t)->>'optOutText'),'allowed',coalesce(communication_private.allowed(t,c,ch),false) and (tpl->>'active')::boolean);
+end;$$;
+revoke all on function public.preview_message(uuid,uuid,text,text,uuid) from public,anon;
+grant execute on function public.preview_message(uuid,uuid,text,text,uuid) to authenticated;

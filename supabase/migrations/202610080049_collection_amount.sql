@@ -1,0 +1,1 @@
+do $$declare b text;begin b:=pg_get_functiondef('public.record_collection(uuid,uuid,text,text,date,text,uuid)'::regprocedure);b:=replace(b,'is not distinct from amount::bigint','is not distinct from record_collection.amount::bigint');execute b;end;$$;

@@ -7,6 +7,8 @@ export default async function SettingsPage() {
   const t = await getTranslations('App');
   const options: [string, string, Permission][] = [
     ['products', 'productsHelp', 'tenant.manage'],
+    ['communication', 'communicationHelp', 'tenant.manage'],
+    ['integrations', 'integrationsHelp', 'tenant.manage'],
     ['documents', 'documentsHelp', 'tenant.manage'],
     ['brand', 'brandHelp', 'tenant.manage'],
     ['team', 'teamHelp', 'users.manage'],

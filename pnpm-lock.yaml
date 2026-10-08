@@ -139,6 +139,8 @@ importers:
         specifier: ^10.6.0
         version: 10.6.0
 
+  packages/messaging: {}
+
   packages/ui:
     dependencies:
       '@phosphor-icons/react':

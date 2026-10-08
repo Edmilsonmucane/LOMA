@@ -9,6 +9,7 @@ import { formatMoney } from '@loma/loan-engine';
 import { requirePermission } from '@/lib/context';
 import { can } from '@/lib/domain/tenancy';
 import { clientSchema, formatPhone } from '@/lib/domain/clients';
+import { ConsentDrawer } from '@/components/communication-controls';
 import { ClientEditor } from '@/components/client-editor';
 import {
   ClientActivity,
@@ -23,6 +24,7 @@ export default async function ClientPage({
   if (!z.uuid().safeParse(id).success) notFound();
   const { db, tenant, permissions } = await requirePermission('clients.read');
   const t = await getTranslations('Clients');
+  const communication = await getTranslations('Communications');
   const applications = await getTranslations('Applications');
   const { data: client } = await db
     .from('clients')
@@ -195,11 +197,23 @@ export default async function ClientPage({
         ))}
         <section className="client-section">
           <h2>{t('consentTitle')}</h2>
+          {editable && (
+            <ConsentDrawer client={{ id: client.id, name: client.name }} />
+          )}
           <dl className="client-facts">
             {(['sms', 'whatsapp', 'email'] as const).map((k) => (
               <div key={k}>
                 <dt>{t(`channels.${k}`)}</dt>
-                <dd>{t(input.consent[k] ? 'allowed' : 'notAllowed')}</dd>
+                <dd>
+                  {t(
+                    input.consent[k] &&
+                      !(client.communication_blocks as Record<string, boolean>)[
+                        k
+                      ]
+                      ? 'allowed'
+                      : 'notAllowed',
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
@@ -253,6 +267,10 @@ export default async function ClientPage({
               reason?: string;
               status?: string;
               note?: string;
+              channel?: 'sms' | 'email' | 'whatsapp';
+              message_state?: string;
+              activity?: string;
+              due?: string;
               title?: string;
               current?: {
                 sms: boolean;
@@ -292,6 +310,18 @@ export default async function ClientPage({
                     </p>
                   )}
                   {detail.note && <p>{detail.note}</p>}
+                  {detail.activity && (
+                    <p>
+                      {communication(`activities.${detail.activity}`)}
+                      {detail.due ? ` · ${date(detail.due)}` : ''}
+                    </p>
+                  )}
+                  {detail.channel && detail.message_state && (
+                    <p>
+                      {communication(detail.channel)} ·{' '}
+                      {communication(`states.${detail.message_state}`)}
+                    </p>
+                  )}
                   {detail.title && <p>{detail.title}</p>}
                   {detail.current && (
                     <p>

@@ -65,9 +65,9 @@ try {
   originalSecurity = a.security;
   await check('RLS enabled on every business and platform table', async () => {
     const { rows } = await db.query(
-      "select relname,relrowsecurity from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='public' and relkind='r' and relname in ('platform_admins','plans','presets','tenants','branches','tenant_roles','memberships','tenant_configuration','audit_events','platform_audit_events','products','product_versions','clients','client_keys','client_events','client_documents','applications','application_events','contracts','loans','loan_accounts','loan_instalments','receipt_counters','payments','payment_reversals','cash_sessions','cash_deposits','journal_transactions')",
+      "select relname,relrowsecurity from pg_class join pg_namespace n on n.oid=relnamespace where n.nspname='public' and relkind='r' and relname in ('platform_admins','plans','presets','tenants','branches','tenant_roles','memberships','tenant_configuration','audit_events','platform_audit_events','products','product_versions','clients','client_keys','client_events','client_documents','applications','application_events','contracts','loans','loan_accounts','loan_instalments','receipt_counters','payments','payment_reversals','cash_sessions','cash_deposits','journal_transactions','campaigns','message_jobs','message_events','collection_actions','collection_assignments','leads')",
     );
-    assert.equal(rows.length, 28);
+    assert.equal(rows.length, 34);
     assert(rows.every((row) => row.relrowsecurity));
   });
   for (const table of [
@@ -90,6 +90,12 @@ try {
     'cash_sessions',
     'cash_deposits',
     'journal_transactions',
+    'campaigns',
+    'message_jobs',
+    'message_events',
+    'collection_actions',
+    'collection_assignments',
+    'leads',
   ])
     await check(`Tenant A cannot read B: ${table}`, async () => {
       const { data, error } = await actor

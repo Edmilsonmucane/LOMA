@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M5)
+## Comandos (M0–M6)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -24,6 +24,8 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm test:clients (base/Auth/Storage reais e lote de 500)
 - pnpm test:applications (pedidos/contratos/desembolso e RLS reais)
 - pnpm test:payments (pagamentos/recibos/mora/caixa/razão e RLS reais; após test:applications)
+- pnpm test:messages (comunicações/campanhas/cobranças reais; após test:applications)
+- pnpm messages:run / pnpm messages:watch
 - pnpm backfill:local (planos históricos sem repor a base)
 - pnpm dev
 - pnpm typecheck
@@ -59,3 +61,7 @@ Decisão/desembolso apenas pelos RPCs autorizados, com revisão e locks. Não pe
 ## Dinheiro e caixa (M5)
 
 Chave FINANCIAL_SIGNING_KEY apenas no servidor e financial_private.signing_key. Nunca imprimir, incluir no browser ou reutilizar para autenticação. Atestar exclusivamente contratos lidos com sessão/RLS; assinatura não substitui autorização SQL. Desembolso, plano e razão na mesma transacção. SQL calcula imputação a partir dos saldos, revisão e snapshot; nunca aceitar allocations/totais do navegador. Chave idempotente deve sobreviver a tentativas repetidas. Recibo/contador/pagamento/razão/history são atómicos. Estorno append-only restaura componentes, preserva recibo e não recalcula mora histórica. Toda saída de numerário exige caixa aberto e fundos suficientes. Testar saldos por strings, equilíbrio de cada movimento e soma de recebíveis = carteira.
+
+## Comunicação e cobranças (M6)
+
+Credenciais apenas cifradas em communication_private; nunca devolver ou imprimir token/callback secret. Sessões operacionais usam RPC/RLS, nunca a ligação técnica do worker. Custos são strings de centavos. Consentimento e opt-out são conferidos no enqueue e no despacho; uma edição normal não remove bloqueios. Não chamar accepted de delivered. Persistir uncertain/dispatching antes do provedor; interrupção/timeout não pode gerar reenvio automático. Retry apenas em rejeição explícita, com backoff editável. DNS público fixado na ligação TLS, sem destinos privados/redireccionamentos. Callbacks exigem HMAC dos bytes exactos, tenant/canal e deduplicação. Não correr serviços/seed/testes de base durante Playwright; test:messages pausa/retoma apenas o worker que encontrou activo.

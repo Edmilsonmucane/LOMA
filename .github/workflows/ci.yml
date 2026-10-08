@@ -18,6 +18,7 @@ jobs:
       - run: pnpm test:clients
       - run: pnpm test:applications
       - run: pnpm test:payments
+      - run: pnpm test:messages
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check

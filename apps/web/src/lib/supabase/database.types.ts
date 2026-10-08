@@ -235,6 +235,63 @@ export type Database = {
           },
         ];
       };
+      campaigns: {
+        Row: {
+          branch_id: string;
+          channel: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          name: string;
+          scheduled_at: string;
+          segment: Json;
+          status: string;
+          template_key: string;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          channel: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          name: string;
+          scheduled_at: string;
+          segment: Json;
+          status?: string;
+          template_key: string;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          channel?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          name?: string;
+          scheduled_at?: string;
+          segment?: Json;
+          status?: string;
+          template_key?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'campaigns_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'campaigns_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       cash_deposits: {
         Row: {
           amount: number;
@@ -467,6 +524,7 @@ export type Database = {
           birth_date: string | null;
           branch_id: string;
           classification: string;
+          communication_blocks: Json;
           consent: Json;
           created_at: string;
           expenses: number | null;
@@ -475,6 +533,7 @@ export type Database = {
           name: string;
           profile: Json;
           revision: number;
+          risk_class: string | null;
           tenant_id: string;
           updated_at: string;
         };
@@ -482,6 +541,7 @@ export type Database = {
           birth_date?: string | null;
           branch_id: string;
           classification?: string;
+          communication_blocks?: Json;
           consent: Json;
           created_at?: string;
           expenses?: number | null;
@@ -490,6 +550,7 @@ export type Database = {
           name: string;
           profile: Json;
           revision?: number;
+          risk_class?: string | null;
           tenant_id: string;
           updated_at?: string;
         };
@@ -497,6 +558,7 @@ export type Database = {
           birth_date?: string | null;
           branch_id?: string;
           classification?: string;
+          communication_blocks?: Json;
           consent?: Json;
           created_at?: string;
           expenses?: number | null;
@@ -505,6 +567,7 @@ export type Database = {
           name?: string;
           profile?: Json;
           revision?: number;
+          risk_class?: string | null;
           tenant_id?: string;
           updated_at?: string;
         };
@@ -522,6 +585,109 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'tenants';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      collection_actions: {
+        Row: {
+          actor_id: string;
+          amount: number | null;
+          branch_id: string;
+          created_at: string;
+          due_on: string | null;
+          id: string;
+          kind: string;
+          loan_id: string;
+          note: string;
+          tenant_id: string;
+        };
+        Insert: {
+          actor_id: string;
+          amount?: number | null;
+          branch_id: string;
+          created_at?: string;
+          due_on?: string | null;
+          id?: string;
+          kind: string;
+          loan_id: string;
+          note: string;
+          tenant_id: string;
+        };
+        Update: {
+          actor_id?: string;
+          amount?: number | null;
+          branch_id?: string;
+          created_at?: string;
+          due_on?: string | null;
+          id?: string;
+          kind?: string;
+          loan_id?: string;
+          note?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'collection_actions_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'collection_actions_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      collection_assignments: {
+        Row: {
+          assigned_at: string;
+          branch_id: string;
+          loan_id: string;
+          target: number;
+          tenant_id: string;
+          user_id: string;
+        };
+        Insert: {
+          assigned_at?: string;
+          branch_id: string;
+          loan_id: string;
+          target: number;
+          tenant_id: string;
+          user_id: string;
+        };
+        Update: {
+          assigned_at?: string;
+          branch_id?: string;
+          loan_id?: string;
+          target?: number;
+          tenant_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'collection_assignments_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'collection_assignments_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'collection_assignments_tenant_id_user_id_fkey';
+            columns: ['tenant_id', 'user_id'];
+            isOneToOne: false;
+            referencedRelation: 'memberships';
+            referencedColumns: ['tenant_id', 'user_id'];
           },
         ];
       };
@@ -641,6 +807,70 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'payments';
             referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      leads: {
+        Row: {
+          branch_id: string;
+          client_id: string | null;
+          consent: Json;
+          created_at: string;
+          id: string;
+          name: string;
+          origin: string;
+          phone: string;
+          revision: number;
+          status: string;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          client_id?: string | null;
+          consent?: Json;
+          created_at?: string;
+          id?: string;
+          name: string;
+          origin: string;
+          phone: string;
+          revision?: number;
+          status: string;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          client_id?: string | null;
+          consent?: Json;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          origin?: string;
+          phone?: string;
+          revision?: number;
+          status?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'leads_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'leads_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'leads_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -854,6 +1084,145 @@ export type Database = {
           },
           {
             foreignKeyName: 'memberships_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      message_events: {
+        Row: {
+          created_at: string;
+          detail: Json;
+          id: string;
+          message_id: string;
+          state: string;
+          tenant_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          detail?: Json;
+          id?: string;
+          message_id: string;
+          state: string;
+          tenant_id: string;
+        };
+        Update: {
+          created_at?: string;
+          detail?: Json;
+          id?: string;
+          message_id?: string;
+          state?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'message_events_message_id_tenant_id_fkey';
+            columns: ['message_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'message_jobs';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      message_jobs: {
+        Row: {
+          accepted_at: string | null;
+          attempted_at: string | null;
+          attempts: number;
+          available_at: string;
+          body: string;
+          branch_id: string;
+          campaign_id: string | null;
+          channel: string;
+          client_id: string;
+          cost: number;
+          cost_text: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          provider_id: string | null;
+          reason: string | null;
+          source_key: string;
+          status: string;
+          template_key: string;
+          template_snapshot: Json;
+          tenant_id: string;
+          variables: Json;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          attempted_at?: string | null;
+          attempts?: number;
+          available_at?: string;
+          body: string;
+          branch_id: string;
+          campaign_id?: string | null;
+          channel: string;
+          client_id: string;
+          cost?: number;
+          cost_text?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          provider_id?: string | null;
+          reason?: string | null;
+          source_key: string;
+          status?: string;
+          template_key: string;
+          template_snapshot?: Json;
+          tenant_id: string;
+          variables: Json;
+        };
+        Update: {
+          accepted_at?: string | null;
+          attempted_at?: string | null;
+          attempts?: number;
+          available_at?: string;
+          body?: string;
+          branch_id?: string;
+          campaign_id?: string | null;
+          channel?: string;
+          client_id?: string;
+          cost?: number;
+          cost_text?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          provider_id?: string | null;
+          reason?: string | null;
+          source_key?: string;
+          status?: string;
+          template_key?: string;
+          template_snapshot?: Json;
+          tenant_id?: string;
+          variables?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'message_jobs_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'message_jobs_campaign_id_tenant_id_fkey';
+            columns: ['campaign_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'campaigns';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'message_jobs_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'message_jobs_tenant_id_fkey';
             columns: ['tenant_id'];
             isOneToOne: false;
             referencedRelation: 'tenants';
@@ -1333,7 +1702,12 @@ export type Database = {
         Args: { c: string; note: string; t: string };
         Returns: string;
       };
+      assign_collection: {
+        Args: { l: string; t: string; target: string; u: string };
+        Returns: undefined;
+      };
       branch_allowed: { Args: { b: string; t: string }; Returns: boolean };
+      cancel_campaign: { Args: { c: string; t: string }; Returns: undefined };
       cash_summary: { Args: { b: string; t: string }; Returns: Json };
       client_allowed: {
         Args: { c: string; p?: string; t: string };
@@ -1344,9 +1718,33 @@ export type Database = {
         Returns: boolean;
       };
       client_search_text: { Args: { value: string }; Returns: string };
+      collection_targets: { Args: { t: string }; Returns: Json };
+      collections_summary: {
+        Args: {
+          max_days?: number;
+          min_days?: number;
+          only_mine?: boolean;
+          query?: string;
+          t: string;
+        };
+        Returns: Json;
+      };
       complete_client_document: {
         Args: { did: string; t: string };
         Returns: boolean;
+      };
+      create_campaign: {
+        Args: {
+          b: string;
+          ch: string;
+          name: string;
+          request_id: string;
+          scheduled: string;
+          segment: Json;
+          t: string;
+          template: string;
+        };
+        Returns: string;
       };
       disburse_application: {
         Args: {
@@ -1418,17 +1816,72 @@ export type Database = {
         };
         Returns: string;
       };
+      message_history: {
+        Args: { query?: string; selected_state?: string; t: string };
+        Returns: Json;
+      };
+      preview_campaign: {
+        Args: {
+          b: string;
+          ch: string;
+          segment: Json;
+          t: string;
+          template: string;
+        };
+        Returns: Json;
+      };
+      preview_message: {
+        Args: {
+          c: string;
+          ch: string;
+          loan?: string;
+          t: string;
+          template: string;
+        };
+        Returns: Json;
+      };
       preview_payment: {
         Args: { amount: string; l: string; t: string };
         Returns: Json;
       };
       product_shape: { Args: { c: Json }; Returns: boolean };
+      provider_callback: {
+        Args: { ch: string; payload: string; signature: string; t: string };
+        Returns: boolean;
+      };
+      provider_challenge: {
+        Args: { challenge: string; t: string; token: string };
+        Returns: string;
+      };
       provision_tenant: {
         Args: {
           preset_id: string;
           selected_plan_id: string;
           tenant_name: string;
           tenant_slug: string;
+        };
+        Returns: string;
+      };
+      queue_message: {
+        Args: {
+          c: string;
+          ch: string;
+          loan?: string;
+          request_id: string;
+          t: string;
+          template: string;
+        };
+        Returns: string;
+      };
+      record_collection: {
+        Args: {
+          amount?: string;
+          due?: string;
+          kind: string;
+          l: string;
+          note: string;
+          request_id?: string;
+          t: string;
         };
         Returns: string;
       };
@@ -1503,6 +1956,28 @@ export type Database = {
         };
         Returns: string;
       };
+      save_communication_configuration: {
+        Args: {
+          category_name: string;
+          key_name: string;
+          settings: Json;
+          t: string;
+        };
+        Returns: undefined;
+      };
+      save_integration: {
+        Args: { ch: string; settings: Json; t: string };
+        Returns: undefined;
+      };
+      save_lead: {
+        Args: {
+          data: Json;
+          expected_revision?: number;
+          selected?: string;
+          t: string;
+        };
+        Returns: string;
+      };
       save_product: {
         Args: {
           conditions: Json;
@@ -1536,6 +2011,7 @@ export type Database = {
           birth_date: string | null;
           branch_id: string;
           classification: string;
+          communication_blocks: Json;
           consent: Json;
           created_at: string;
           expenses: number | null;
@@ -1544,6 +2020,7 @@ export type Database = {
           name: string;
           profile: Json;
           revision: number;
+          risk_class: string | null;
           tenant_id: string;
           updated_at: string;
         }[];
@@ -1562,6 +2039,16 @@ export type Database = {
           t: string;
         };
         Returns: Json;
+      };
+      set_communication_consent: {
+        Args: {
+          c: string;
+          ch: string;
+          enabled: boolean;
+          source: string;
+          t: string;
+        };
+        Returns: undefined;
       };
       tenant_session_valid: { Args: { t: string }; Returns: boolean };
       tenant_usage: {

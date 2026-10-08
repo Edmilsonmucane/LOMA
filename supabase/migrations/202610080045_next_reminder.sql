@@ -1,0 +1,1 @@
+do $$declare b text;begin b:=pg_get_functiondef('public.queue_message(uuid,uuid,text,text,uuid,uuid)'::regprocedure);b:=replace(b,$old$i.due_date<=(now() at time zone 'Africa/Maputo')::date$old$,'i.due_date=(select min(ii.due_date) from public.loan_instalments ii where ii.loan_id=loan and ii.tenant_id=t and ii.principal+ii.interest+ii.fine+ii.late_interest>0)');execute b;end;$$;

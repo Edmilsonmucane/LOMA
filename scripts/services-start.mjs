@@ -45,6 +45,7 @@ try {
       'supabase/compose.local.yml',
       'restart',
       'api',
+      'messages',
     ],
     { stdio: ['ignore', 'pipe', 'pipe'] },
   );
@@ -105,8 +106,42 @@ try {
   execFileSync(process.execPath, ['scripts/backfill-loans.mjs'], {
     stdio: 'inherit',
   });
+  execFileSync(
+    'docker',
+    [
+      'compose',
+      '--env-file',
+      '.local/runtime.env',
+      '-f',
+      'supabase/compose.local.yml',
+      'restart',
+      'messages',
+    ],
+    { stdio: ['ignore', 'pipe', 'pipe'] },
+  );
+  const { default: pg } = await import('pg');
+  const verification = new pg.Client({
+    connectionString: `postgres://postgres:${runtime.password}@127.0.0.1:54322/postgres`,
+  });
+  await verification.connect();
+  let workerReady = false;
+  try {
+    for (let i = 0; i < 60; i++) {
+      const result = await verification.query(
+        "select last_run>now()-interval '35 seconds' ready from communication_private.worker_health where id",
+      );
+      if (result.rows[0]?.ready) {
+        workerReady = true;
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  } finally {
+    await verification.end();
+  }
+  if (!workerReady) throw new Error('Message worker startup failed');
   console.log(
-    'Local PostgreSQL, Supabase Auth, PostgREST, private Storage and mail are ready.',
+    'Local PostgreSQL, Auth, PostgREST, private Storage, daily finance, messages and mail are ready.',
   );
 } catch (error) {
   if (error.stdout || error.stderr)

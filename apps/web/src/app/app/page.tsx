@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { MessageDrawer } from '@/components/communication-controls';
+import { communicationTemplates } from '@/lib/communications';
 import { MoneyText } from '@/components/money-text';
 import { getTranslations } from 'next-intl/server';
 import { getTenantContext } from '@/lib/context';
@@ -14,6 +16,12 @@ export default async function TodayPage() {
   const { data, error } = await db.rpc('today_summary', { t: tenant.id });
   if (error) throw new Error('Today summary unavailable');
   const s = todaySchema.parse(data);
+  const canMessage =
+    can(permissions, 'messages.manage') ||
+    can(permissions, 'collections.manage');
+  const templates = canMessage
+    ? await communicationTemplates(db, tenant.id)
+    : [];
   return (
     <>
       <div className="page-heading">
@@ -70,6 +78,13 @@ export default async function TodayPage() {
               </p>
             </span>
             <div className="form-actions">
+              {canMessage && (
+                <MessageDrawer
+                  templates={templates}
+                  client={{ id: r.client_id, name: r.name }}
+                  loan={r.id}
+                />
+              )}
               {r.phone && /^\+?[0-9 ]+$/.test(r.phone) && (
                 <a
                   className="ui-button ui-button-secondary"

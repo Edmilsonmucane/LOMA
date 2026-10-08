@@ -12,7 +12,9 @@ export default createNextIntlPlugin('./src/i18n/request.ts')({
   },
   logging: {
     serverFunctions: false,
-    incomingRequests: { ignore: [/\/auth\/callback/] },
+    incomingRequests: {
+      ignore: [/\/auth\/callback/, /\/api\/message-webhooks\//],
+    },
   },
   devIndicators: false,
   allowedDevOrigins: ['127.0.0.1', '*.localhost'],

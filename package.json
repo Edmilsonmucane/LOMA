@@ -26,7 +26,10 @@
     "test:clients": "node scripts/test-clients.mjs",
     "test:applications": "node scripts/test-applications.mjs",
     "test:payments": "node scripts/test-payments.mjs",
-    "backfill:local": "node scripts/backfill-loans.mjs"
+    "backfill:local": "node scripts/backfill-loans.mjs",
+    "messages:run": "node scripts/message-worker.mjs",
+    "messages:watch": "node scripts/message-worker.mjs --watch",
+    "test:messages": "node scripts/test-messages.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
