@@ -87,3 +87,11 @@ Pedido em quatro etapas, foco no título da etapa e gravação ao avançar. Cód
 Site usa HTML inicial e JavaScript funcional pequeno, sem transportar motor/formulários internos. Skeletons internos existentes permanecem; público apresenta conteúdo renderizado no servidor. Alvos de 44px, foco visível, reduced motion e layout móvel sem grelhas decorativas. Prestação principal tem moeda menor/secundária, incluindo actualização da simulação. Botões de envio aguardam os eventos; formulários pessoais usam POST.
 
 Validação M7: temas Clássico/Moderno revistos em produção a 1440/390px; pedido, simulador, login/cliente e editor com scans axe AA, teclado e ausência de overflow. Lighthouse móvel: início 100/100, simulador 97/100 (desempenho/acessibilidade), transferência inicial de JavaScript 147 528 bytes, incluindo o framework. Sem ensaio com leitor de ecrã ou gestor real; detalhes e limites em PROGRESS.md.
+
+## M8 — Informação para decidir
+
+Relatórios têm um título, filtros com rótulos, Consultar como acção principal, e PDF/CSV como acções secundárias. Tabela em superfície branca com linhas finas, números tabulares e scroll horizontal limitado à tabela no telemóvel. Totais pequenos mantêm movimentos de entrada/saída separados. Estado vazio indica como alterar os filtros; aviso explícito quando há limite de linhas. Datas de saldo e período não são confundidas.
+
+Score aparece na ficha e no pedido: classe, pontos, limite sugerido e explicação opcional. Informação em falta é indicada. Configuração mostra pré-visualização real, pesos/intervalos em detalhes expansíveis e classes/escalões em campos simples. Nenhum gráfico decorativo ou matriz de permissões. Alterações explicam o efeito e preservação de contratos. O registo de evidências e a confirmação de reposição usam drawers Radix com foco e alvos de 44px.
+
+Demonstração tem aviso textual discreto e uma única acção de reposição em Definições. A confirmação explica o arquivo antes de criar a nova geração. Mantêm-se os tokens, Instrument Sans, accent por tenant, Phosphor, linguagem pt-MZ e estados humanos. Não foram introduzidas cores soltas, sombras em cartões, gradientes, emojis ou ilustrações.

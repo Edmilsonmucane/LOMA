@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ScorePanel } from '@/components/score-panel';
 import { formatDate } from '@/lib/domain/dates';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -255,6 +256,7 @@ export default async function ClientPage({
           <p className="ui-help">{t('signedHelp')}</p>
         </section>
       </div>
+      <ScorePanel client={id} />
       <section className="client-section">
         <h2>{t('timeline')}</h2>
         {editable && <ClientActivity id={id} />}

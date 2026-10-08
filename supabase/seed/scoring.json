@@ -1,0 +1,204 @@
+{
+  "criteria": [
+    {
+      "key": "punctuality",
+      "weight": 30,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "60",
+          "score": 10
+        },
+        {
+          "until": "80",
+          "score": 40
+        },
+        {
+          "until": "95",
+          "score": 70
+        },
+        {
+          "until": null,
+          "score": 100
+        }
+      ]
+    },
+    {
+      "key": "averageDelay",
+      "weight": 20,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "0",
+          "score": 100
+        },
+        {
+          "until": "7",
+          "score": 70
+        },
+        {
+          "until": "30",
+          "score": 35
+        },
+        {
+          "until": null,
+          "score": 0
+        }
+      ]
+    },
+    {
+      "key": "previousLoans",
+      "weight": 10,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "0",
+          "score": 30
+        },
+        {
+          "until": "2",
+          "score": 60
+        },
+        {
+          "until": null,
+          "score": 100
+        }
+      ]
+    },
+    {
+      "key": "tenureDays",
+      "weight": 10,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "90",
+          "score": 30
+        },
+        {
+          "until": "365",
+          "score": 60
+        },
+        {
+          "until": null,
+          "score": 100
+        }
+      ]
+    },
+    {
+      "key": "paymentRatio",
+      "weight": 20,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "20",
+          "score": 100
+        },
+        {
+          "until": "35",
+          "score": 70
+        },
+        {
+          "until": "50",
+          "score": 30
+        },
+        {
+          "until": null,
+          "score": 0
+        }
+      ]
+    },
+    {
+      "key": "employmentMonths",
+      "weight": 5,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "6",
+          "score": 30
+        },
+        {
+          "until": "24",
+          "score": 60
+        },
+        {
+          "until": null,
+          "score": 100
+        }
+      ]
+    },
+    {
+      "key": "verifiedReferences",
+      "weight": 5,
+      "missingScore": 50,
+      "bands": [
+        {
+          "until": "0",
+          "score": 20
+        },
+        {
+          "until": "1",
+          "score": 60
+        },
+        {
+          "until": null,
+          "score": 100
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "A",
+      "minScore": 80,
+      "suggestedLimit": "5000000"
+    },
+    {
+      "key": "B",
+      "minScore": 65,
+      "suggestedLimit": "3000000"
+    },
+    {
+      "key": "C",
+      "minScore": 50,
+      "suggestedLimit": "1500000"
+    },
+    {
+      "key": "D",
+      "minScore": 35,
+      "suggestedLimit": "500000"
+    },
+    {
+      "key": "E",
+      "minScore": 0,
+      "suggestedLimit": "0"
+    }
+  ],
+  "provisions": [
+    {
+      "name": "Em dia",
+      "fromDays": 0,
+      "percentage": "0"
+    },
+    {
+      "name": "1–30 dias",
+      "fromDays": 1,
+      "percentage": "1"
+    },
+    {
+      "name": "31–60 dias",
+      "fromDays": 31,
+      "percentage": "5"
+    },
+    {
+      "name": "61–90 dias",
+      "fromDays": 61,
+      "percentage": "20"
+    },
+    {
+      "name": "Mais de 90 dias",
+      "fromDays": 91,
+      "percentage": "50"
+    }
+  ],
+  "provisionBasis": "principal"
+}

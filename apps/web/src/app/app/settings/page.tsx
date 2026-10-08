@@ -3,10 +3,14 @@ import { getTranslations } from 'next-intl/server';
 import { getTenantContext } from '@/lib/context';
 import { can, type Permission } from '@/lib/domain/tenancy';
 export default async function SettingsPage() {
-  const { permissions } = await getTenantContext();
+  const { permissions, tenant } = await getTenantContext();
   const t = await getTranslations('App');
   const options: [string, string, Permission][] = [
     ['products', 'productsHelp', 'tenant.manage'],
+    ['scoring', 'scoringHelp', 'tenant.manage'],
+    ...(tenant.is_demo
+      ? [['demo', 'demoHelp', 'tenant.manage'] as [string, string, Permission]]
+      : []),
     ['communication', 'communicationHelp', 'tenant.manage'],
     ['integrations', 'integrationsHelp', 'tenant.manage'],
     ['documents', 'documentsHelp', 'tenant.manage'],

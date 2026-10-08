@@ -10,3 +10,11 @@ export function formatDate(value: string, months: readonly string[]): string {
   const part = (type: string) => parts.find((x) => x.type === type)!.value;
   return `${Number(part('day'))} ${months[Number(part('month')) - 1]} ${part('year')}`;
 }
+export function maputoToday() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Maputo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}

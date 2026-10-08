@@ -65,3 +65,11 @@ Vigiar communication_private.worker_health.last_run, jobs queued com available_a
 Restaurar customer_accounts, portal_drafts, portal_documents, Auth e ficheiros privados em conjunto. Portal não pode ser reconstruído ligando clientes por BI/NUIT ou por telefone secundário: preservar vínculos explícitos. Recuperar portal_private.request_key e PUBLIC_REQUEST_SIGNING_KEY correspondente antes de voltar a aceitar operações públicas. A chave não substitui Auth/RLS nem pode ser reutilizada para assinar JWT.
 
 OTP do hook console local é efémero; não usar estes códigos como backup de negócio nem publicar logs. Em Supabase alojado, activar telefone, configurar SMS e CAPTCHA do Auth e conferir um destino autorizado. TRUSTED_CLIENT_IP_HEADER só pode referir um valor que o proxy confiável substitua. Validar duração da sessão, limites e exposição pública das configurações após restauro. Provedor console, migrações locais e draft cloud não demonstram entrega externa ou restauro alojado. Detalhes em PUBLIC_SITE.md.
+
+## M8 — Avaliações e gerações arquivadas
+
+O dump inclui configuração scoring, evidência, avaliações imutáveis e todas as gerações de demonstração. Repor demonstração é uma operação de produto: arquiva o tenant anterior e cria outro no mesmo subdomínio. Não é um restauro de backup. Não reactivar o slug arquivado por uma edição directa, nem apagar contratos/recibos/razão para libertar espaço. A retenção e recuperação administrativa seguem o procedimento de backup completo e autorização do operador.
+
+O HMAC de demonstração usa FINANCIAL_SIGNING_KEY com prefixo `demo:`; não é chave Auth. Restauro deve repor coerentemente a chave no servidor e `financial_private.signing_key`, além das chaves Auth/portal/integrações existentes. Não guardar valores em documentos ou configuração cloud pública. Relatórios recuperados exigem sessões/permissões e não devem ser colocados num bucket público.
+
+`pnpm seed` só repõe a carteira inicial quando uma demonstração está vazia e na geração zero; reexecuções preservam a geração. `test:fresh` cria e remove apenas uma base temporária identificada, sem alterar volumes operacionais. As fixtures do navegador usam tenants próprios, evitando que reposições perturbem a demonstração de vendas.

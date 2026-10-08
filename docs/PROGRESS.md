@@ -57,7 +57,7 @@ Aceite em 7 out 2026 após as verificações abaixo.
 
 Limites: importação é de clientes CSV UTF-8, sem substituir fichas ou inferir consentimento; carteira de créditos antigos exige os módulos financeiros seguintes. Linha do tempo ainda não tem pedidos/pagamentos/mensagens, que não existem. Limpeza de reservas de upload falhadas, exportação/eliminação por retenção e backup automático alojado aguardam os respectivos módulos/configuração de produção. Não foi efectuado ensaio com gestor real. O restauro de snapshot numa tarefa cloud nova continua por validar; os comandos de arranque já guardados continuam a iniciar os serviços acrescentados.
 
-## Próximos marcos
+## Próximos marcos (registo no fim de M3)
 
 M7: site público e área do cliente.
 M8: relatórios, scoring, demonstração e acabamento.
@@ -118,3 +118,20 @@ Aceite em 8 out 2026 após as verificações abaixo.
 - Lighthouse 13.5 móvel, throttling simulado sobre build de produção: início **100 desempenho / 100 acessibilidade**, simulador **97 / 100**; JavaScript transferido **147 528 bytes** em ambos, incluindo framework/cabeçalhos, abaixo de 150 000. `test:site-quality` verifica estes limites e corre em CI.
 
 Limites: SMS externo/Turnstile nativo e cabeçalho de IP confiável requerem configuração do operador alojado; console não comprova entrega no telemóvel. Deploy alojado, restauro numa nova tarefa cloud e ensaio com gestor real não foram executados. Arranque M7 guardado em rascunho: rever, guardar e publicar nas definições do ambiente. M8 — relatórios, scoring, demonstração e acabamento — permanece por executar.
+
+## M8 — Relatórios, demonstração e acabamento
+
+Aceite tecnicamente em 8 out 2026 após as verificações abaixo. O ensaio com gestor real e a publicação alojada continuam pendentes.
+
+- Seis relatórios essenciais com pesquisa/filtros, âmbito de tenant/agência, totais exactos e exportações CSV/PDF autenticadas e auditadas. Provisões usam percentagens/base editáveis e arredondam por crédito. Saldos são actuais; movimentos/previsão respeitam o período. Limite de 5 000 linhas explícito, com totais do conjunto filtrado completo.
+- Score exacto com sete critérios, pesos/intervalos/classes A–E/limites sugeridos editáveis e pré-visualização viva. Informação comprovada distingue factos de informação em falta; ficha e pedido mostram decomposição. Avaliações/configurações anteriores são preservadas; mudanças não alteram contratos. Classes usadas em campanhas actualizam após pagamentos, liquidação, estorno, perfil e passagem do dia.
+- Tenant dedicado de demonstração: 120 clientes moçambicanos sintéticos, 60 créditos com planos/razão/recibos reais, atrasos variados, oito pedidos pendentes, histórico e mensagens console. Seed idempotente; reposição confirmada e assinada arquiva a geração antiga, conserva contratos e mantém o endereço/equipa. Integrações externas são recusadas na demonstração.
+- Acabamento: regiões de tabelas com foco por teclado e nomes acessíveis, contraste AA, interface móvel sem overflow da página, valores tabulares, acção principal e estados úteis. Cobranças mostram todos os escalões por defeito. Revisão visual desktop/mobile concluída; nenhum padrão proibido introduzido.
+- Typecheck, lint, formatação, instalação congelada e build de produção passaram. 175 testes unitários em 15 ficheiros; motor v1 preservado, 90 testes, incluindo 3 000 combinações; cobertura 98,17% instruções / 98,39% ramos / 100% funções / 99,28% linhas.
+- Base/Auth/Storage reais: 47 verificações de isolamento/RLS, quatro grupos de clientes/500 linhas, 12 de pedidos, 15 de pagamentos/caixa/razão, 14 de comunicação, 11 do site/cliente e 14 de M8. Incluem relatórios por permissão/agência, exactidão de score/provisões, configuração concorrente, avaliação proposta sem sobrescrita, cache após liquidação/estorno, histórico imutável e assinatura/arquivo da demonstração.
+- Base temporária vazia: todas as 91 migrações aplicadas, 39 tabelas públicas com RLS e configuração de novos tenants válida. Apenas a base temporária de verificação foi removida. Seed repetida duas vezes preservou demonstração e contas existentes.
+- Playwright completo final: 71 passaram, um omitido (lote de 500 repetido em móvel), zero falhas. Os oito M8 cobrem os dois formatos: relatórios/CSV/PDF, configuração/evidência de scoring, produto → simulação pública → SMS nativo/documento privado → aprovação independente → desembolso → pagamento/recibo → lembrete console automático → cobrança, e reposição com preservação dos 61 contratos da geração anterior.
+- Produção local: sessões reais, relatórios/scoring/demonstração, CSV/PDF com no-store, axe WCAG AA, ausência de overflow e /design HTTP 404 nos dois formatos. Lighthouse móvel: início 96 desempenho / 100 acessibilidade; simulador 97 / 100. JavaScript inicial 147 528 bytes em ambos, abaixo de 150 000.
+- README, arquitectura, desenho, decisões, guia operacional e recuperação actualizados. Instruções start_skill M8 guardadas em rascunho cloud, preservando as definições anteriores; rever/guardar/publicar nas definições do ambiente.
+
+Limites: não houve deploy alojado, envio SMS/WhatsApp/email externo, ensaio com gestor real nem restauro numa nova tarefa cloud. Console comprova processamento de desenvolvimento, não recepção num telemóvel. Produção requer credenciais e configuração Auth/CAPTCHA/provedores, domínios, tarefas e backups próprios; não foi declarada pronta para exploração. Relatórios não reconstroem saldos históricos e exportações com mais de 5 000 linhas exigem restringir filtros. Fixtures temporais de navegador só alteram a proposta não aprovada e o instante do INSERT inicial de aprovação de dados sintéticos; não reescrevem contratos existentes. M0–M8 têm validação técnica local; a validação operacional com gestor permanece por realizar.

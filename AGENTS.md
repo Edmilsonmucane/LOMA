@@ -13,11 +13,11 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M7)
+## Comandos (M0–M8)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
-- pnpm local:env / pnpm local:seed
+- pnpm local:env / pnpm seed (bootstrap e demonstração; idempotente)
 - pnpm db:types (após migrações)
 - pnpm backup:local (dump privado; ver docs/RECOVERY.md)
 - pnpm test:rls (antes de Playwright; usa serviços reais)
@@ -27,6 +27,8 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm test:public (site/cliente/Auth/Storage reais; após test:applications, antes de Playwright)
 - pnpm public:assets
 - pnpm test:site-quality (servidor de produção na porta 3200; Lighthouse móvel e orçamento JS)
+- pnpm test:m8 (relatórios/scoring/demonstração reais; antes de Playwright)
+- pnpm test:fresh (base temporária vazia, sem apagar volumes)
 - pnpm test:messages (comunicações/campanhas/cobranças reais; após test:applications)
 - pnpm messages:run / pnpm messages:watch
 - pnpm backfill:local (planos históricos sem repor a base)
@@ -72,3 +74,7 @@ Credenciais apenas cifradas em communication_private; nunca devolver ou imprimir
 ## Site e cliente (M7)
 
 Ler docs/PUBLIC_SITE.md. portalDb usa sb-loma-customer, separado do pessoal. Autenticação de telefone não concede membership. customer_owns e RPCs conferem Auth/sessão/tenant/vínculo; nunca permitir notas internas ou carteira alheia na área do cliente. Dados de ficha existente são proposta, não edição automática. Upload só em path reservado num rascunho próprio, com JWT do cliente e RLS do Storage. PUBLIC_REQUEST_SIGNING_KEY é separada das chaves de finanças/integrações, nunca impressa. Console SMS local contém códigos temporários e só pode ser lido em contexto privado de desenvolvimento/teste. CAPTCHA/provedor Auth alojados precisam de configuração própria. Nenhum API/documento/ecrã pessoal entra na cache PWA. Não alterar v1 para criar o simulador público.
+
+## Relatórios, scoring e demonstração (M8)
+
+Ler docs/REPORTS_SCORING_DEMO.md. Relatórios usam reports.read e tenant/agência explícitos; CSV/PDF partilham dados, totais e auditoria. Provisões arredondam por crédito, antes de agregar. Nunca chamar soma de desembolsos+recebimentos de saldo. Score usa evidência e pesos editáveis, é sugestão e não muda contratos. Histórico de avaliações é imutável. Demonstração só em tenant identificado e vazio na activação; reposição assinada arquiva a geração anterior, não apaga dados nem contorna invariantes. Assinatura demo: não serve autenticação. Nenhum provedor externo na demonstração. Fixtures temporais de teste só alteram propostas antes da aprovação.

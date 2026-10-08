@@ -2072,3 +2072,167 @@ code {
 .public-page-title {
   padding-top: 48px;
 }
+/* M8: comfortable operational reports and evidence, using the existing tokens. */
+.report-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+  margin-bottom: var(--space-3);
+}
+.report-filters label,
+.scoring-editor label,
+.scoring-evidence label {
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.report-filters input,
+.report-filters select,
+.scoring-editor input,
+.scoring-editor select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+  color: var(--ink);
+}
+.report-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  align-items: center;
+  margin: var(--space-6) 0;
+  flex-wrap: wrap;
+}
+.report-toolbar h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.report-toolbar p {
+  color: var(--muted);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+.data-table th,
+.data-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+.data-table th {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+.scoring-editor {
+  max-width: 860px;
+  display: grid;
+  gap: var(--space-4);
+}
+.scoring-editor h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-top: var(--space-6);
+}
+.score-preview {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: var(--space-6);
+}
+.score-preview h2 {
+  margin: 0;
+}
+.score-value {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin: var(--space-3) 0;
+}
+.score-value span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.score-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  align-items: center;
+}
+.score-criterion {
+  border-bottom: 1px solid var(--line);
+  padding: var(--space-3) 0;
+}
+.score-criterion summary,
+.score-panel summary {
+  min-height: 44px;
+  padding: var(--space-3) 0;
+  cursor: pointer;
+  font-weight: 500;
+}
+.score-bands {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+.demo-banner {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.demo-banner a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--accent);
+  margin-left: var(--space-3);
+}
+@media (max-width: 600px) {
+  .report-toolbar .row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .report-filters {
+    grid-template-columns: 1fr;
+  }
+  .score-fields {
+    grid-template-columns: 1fr;
+  }
+  .data-table th,
+  .data-table td {
+    padding: var(--space-3);
+  }
+}
+.report-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  padding: var(--space-6) 0;
+}
+.report-totals dt {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.report-totals dd {
+  font-weight: 600;
+  margin-top: var(--space-2);
+}

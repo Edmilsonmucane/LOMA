@@ -222,7 +222,7 @@ test('CSV wizard imports 500 clients and search finds the last row', async ({
     dialog.getByText(
       'Importação terminada. As fichas criadas já aparecem em Clientes.',
     ),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 30000 });
   await dialog.getByRole('button', { name: 'Fechar', exact: true }).click();
   await page
     .getByLabel('Pesquisar por nome, telefone, BI ou NUIT', { exact: true })

@@ -13,13 +13,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm services:start
       - run: pnpm local:env
-      - run: pnpm local:seed
+      - run: pnpm seed
       - run: pnpm test:rls
       - run: pnpm test:clients
       - run: pnpm test:applications
       - run: pnpm test:payments
       - run: pnpm test:messages
       - run: pnpm test:public
+      - run: pnpm test:m8
+      - run: pnpm test:fresh
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check

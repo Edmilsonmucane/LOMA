@@ -519,6 +519,60 @@ export type Database = {
           },
         ];
       };
+      client_risk_assessments: {
+        Row: {
+          assessed_at: string;
+          assessed_by: string | null;
+          branch_id: string;
+          client_id: string;
+          configuration: Json;
+          id: string;
+          metrics: Json;
+          result: Json;
+          sequence: number;
+          tenant_id: string;
+        };
+        Insert: {
+          assessed_at?: string;
+          assessed_by?: string | null;
+          branch_id: string;
+          client_id: string;
+          configuration: Json;
+          id?: string;
+          metrics: Json;
+          result: Json;
+          sequence?: never;
+          tenant_id: string;
+        };
+        Update: {
+          assessed_at?: string;
+          assessed_by?: string | null;
+          branch_id?: string;
+          client_id?: string;
+          configuration?: Json;
+          id?: string;
+          metrics?: Json;
+          result?: Json;
+          sequence?: never;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'client_risk_assessments_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'client_risk_assessments_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
       clients: {
         Row: {
           birth_date: string | null;
@@ -1720,6 +1774,54 @@ export type Database = {
           },
         ];
       };
+      scoring_evidence: {
+        Row: {
+          branch_id: string;
+          client_id: string;
+          employment_months: number | null;
+          note: string;
+          tenant_id: string;
+          updated_at: string;
+          updated_by: string | null;
+          verified_references: number | null;
+        };
+        Insert: {
+          branch_id: string;
+          client_id: string;
+          employment_months?: number | null;
+          note: string;
+          tenant_id: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          verified_references?: number | null;
+        };
+        Update: {
+          branch_id?: string;
+          client_id?: string;
+          employment_months?: number | null;
+          note?: string;
+          tenant_id?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          verified_references?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'scoring_evidence_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'scoring_evidence_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
       tenant_configuration: {
         Row: {
           category: string;
@@ -1791,8 +1893,10 @@ export type Database = {
           contact_phone: string;
           created_at: string;
           currency: string;
+          demo_generation: number;
           footer: string;
           id: string;
+          is_demo: boolean;
           legal_name: string;
           license_number: string;
           logo_url: string | null;
@@ -1808,8 +1912,10 @@ export type Database = {
           contact_phone?: string;
           created_at?: string;
           currency?: string;
+          demo_generation?: number;
           footer?: string;
           id?: string;
+          is_demo?: boolean;
           legal_name?: string;
           license_number?: string;
           logo_url?: string | null;
@@ -1825,8 +1931,10 @@ export type Database = {
           contact_phone?: string;
           created_at?: string;
           currency?: string;
+          demo_generation?: number;
           footer?: string;
           id?: string;
+          is_demo?: boolean;
           legal_name?: string;
           license_number?: string;
           logo_url?: string | null;
@@ -1873,6 +1981,10 @@ export type Database = {
       client_object_allowed: {
         Args: { object_path: string; p: string; upload?: boolean };
         Returns: boolean;
+      };
+      client_score: {
+        Args: { cid: string; payment?: string; t: string };
+        Returns: Json;
       };
       client_search_text: { Args: { value: string }; Returns: string };
       collection_targets: { Args: { t: string }; Returns: Json };
@@ -1938,6 +2050,7 @@ export type Database = {
         };
         Returns: string;
       };
+      demo_blueprint: { Args: { t: string }; Returns: Json };
       disburse_application: {
         Args: {
           a_id: string;
@@ -1964,6 +2077,7 @@ export type Database = {
         };
         Returns: string;
       };
+      enable_demo: { Args: { t: string }; Returns: undefined };
       has_permission: { Args: { p: string; t: string }; Returns: boolean };
       import_clients: { Args: { rows: Json; t: string }; Returns: Json };
       initialise_loan: {
@@ -2010,6 +2124,20 @@ export type Database = {
       };
       message_history: {
         Args: { query?: string; selected_state?: string; t: string };
+        Returns: Json;
+      };
+      operational_report: {
+        Args: {
+          agent?: string;
+          b?: string;
+          cid?: string;
+          export_format?: string;
+          from_day: string;
+          kind: string;
+          product?: string;
+          t: string;
+          to_day: string;
+        };
         Returns: Json;
       };
       preview_campaign: {
@@ -2096,6 +2224,10 @@ export type Database = {
         Returns: string;
       };
       refresh_loan: { Args: { l: string; t: string }; Returns: undefined };
+      report_filter_options: {
+        Args: { q?: string; selected?: string; t: string };
+        Returns: Json;
+      };
       reserve_client_document: {
         Args: { c: string; document_data: Json; t: string };
         Returns: {
@@ -2118,6 +2250,15 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      reset_demo: {
+        Args: {
+          expected_generation: number;
+          payload: string;
+          signature: string;
+          t: string;
+        };
+        Returns: string;
       };
       resolve_tenant: {
         Args: { tenant_slug: string };
@@ -2188,6 +2329,14 @@ export type Database = {
       };
       save_public_site: {
         Args: { expected: Json; settings: Json; t: string };
+        Returns: undefined;
+      };
+      save_scoring_configuration: {
+        Args: { expected: Json; settings: Json; t: string };
+        Returns: undefined;
+      };
+      save_scoring_evidence: {
+        Args: { cid: string; input: Json; t: string };
         Returns: undefined;
       };
       search_applications: {

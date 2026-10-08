@@ -19,6 +19,7 @@ const accounts = existsSync('.local/accounts.json')
   : {};
 const definitions = [
   ['platform', 'plataforma@loma.test', 'Administração LOMA'],
+  ['sales', 'gestor@demonstracao.loma.test', 'Amélia Cossa'],
   ['manager', 'gestor@demo.loma.test', 'Amélia Mucavele'],
   ['analyst', 'analista@demo.loma.test', 'Olívia Mondlane'],
   ['cashier', 'caixa@demo.loma.test', 'Ernesto Chissano'],

@@ -142,3 +142,17 @@
 - Stack vazia temporária: 75 migrações, 37 tabelas públicas com RLS. Instalação congelada e arranque/env/seed repetidos preservaram dados; apenas volumes temporários de verificação foram removidos.
 - Produção local: temas 1440/390px, páginas públicas, OTP nativo, carteira própria/pagamento, axe AA, envio desactivado sem eventos, pessoal/editor e cache apenas offline. Lighthouse móvel: início 100/100, simulador 97/100; transferência JavaScript 147 528 bytes. Sem erros inesperados de navegador; catálogo recusado em produção.
 - Arranque cloud M7 guardado em rascunho, sem publicar/deploy. SMS externo/CAPTCHA alojado, restauro numa nova tarefa e ensaio com gestor real não foram executados. Próximo marco M8.
+
+## 2026-10-08 — M8: relatórios, scoring e demonstração
+
+- Relatórios consultam saldos/lançamentos reais por RPC com permissão própria, tenant e agência explícitos. Montantes continuam strings de centavos; exportações CSV/PDF partilham os mesmos dados e registam acesso. Data de referência é hoje para saldos, intervalo para movimentos/previsão; não se inventam saldos históricos.
+- Score é uma média ponderada exacta com critérios/intervalos/classes/limites em configuração editável. Factos vêm da ficha e do histórico real; critérios sem evidência são indicados. Classes de risco e escalões de atraso/provisão têm configurações distintas. Avaliações guardam revisão/configuração e não alteram contratos aprovados.
+- Demonstração tem tenant dedicado e dados sintéticos identificados. Reposição arquiva a geração anterior e cria uma nova no mesmo subdomínio, preservando contratos, razão e auditoria; não desactiva triggers, RLS ou invariantes financeiros. Só uma demonstração identificada pode usar este mecanismo; payload criado e atestado no servidor, nunca no browser.
+
+- Opções de relatórios têm RPC mínimo próprio, evitando conceder gestão de equipa para filtrar agentes. Pesquisa por nome reduz a lista de clientes; dados e exportações continuam no mesmo âmbito. Totais distinguem desembolsos, recebimentos e estornos; provisões arredondam por crédito antes da soma.
+- Demonstração local dedicada usa slug demonstracao e conta sales, preservando fixtures demo/beira. Seed repetida não repõe a carteira. Créditos históricos sintéticos usam exigências documentais vazias nos presets de demonstração; não se fabrica evidência Storage.
+- Teste completo de navegador usa fixture temporal na proposta ainda não aprovada e no instante de criação do acontecimento de aprovação (trigger temporário privado limitado ao UUID dessa proposta) para exercitar vencimento sem esperar um mês. Nenhum contrato ou lançamento existente é reescrito, e não há endpoint de controlo do relógio.
+
+- Tabelas horizontais de relatórios e decomposição do score têm região identificada e foco por teclado, incluindo Safari móvel. Testes aguardam explicitamente operações de carteira (recalcular 120 clientes e criar 60 créditos), sem substituir confirmação por uma pausa fixa.
+
+- Validação final M8: 175 unitários, motor acima de 95%, 14 grupos nativos M8, 91 migrações numa base vazia/39 tabelas RLS, Playwright completo 71 passados/um omitido e build/typecheck/lint/formatação verdes. Lighthouse móvel 96/100 no início e 97/100 no simulador, 147 528 bytes JS. Instruções cloud guardadas em rascunho; sem publicação alojada, entrega externa ou ensaio com gestor real. Evidência e limites em PROGRESS.md.

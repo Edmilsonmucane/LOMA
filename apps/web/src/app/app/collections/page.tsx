@@ -32,9 +32,18 @@ export default async function CollectionsPage({
     .eq('key', 'rules')
     .single();
   const rules = rulesSchema.parse(config?.value),
-    bucket = Number(q.bucket ?? 0),
-    min = bucket ? rules.buckets[bucket - 1]! + 1 : 1,
-    max = rules.buckets[bucket] ?? 100000;
+    parsedBucket = z.coerce
+      .number()
+      .int()
+      .min(0)
+      .max(rules.buckets.length)
+      .safeParse(q.bucket),
+    bucket =
+      q.bucket === undefined || q.bucket === 'all' || !parsedBucket.success
+        ? null
+        : parsedBucket.data,
+    min = bucket === null ? 1 : bucket ? rules.buckets[bucket - 1]! + 1 : 1,
+    max = bucket === null ? 100000 : (rules.buckets[bucket] ?? 100000);
   const { data, error } = await db.rpc('collections_summary', {
     t: tenant.id,
     query: q.q ?? '',
@@ -94,8 +103,9 @@ export default async function CollectionsPage({
         <select
           id="collection-bucket"
           name="bucket"
-          defaultValue={q.bucket ?? '0'}
+          defaultValue={bucket === null ? 'all' : String(bucket)}
         >
+          <option value="all">{t('all')}</option>
           {[...rules.buckets, 100000].map((n, i) => (
             <option key={i} value={i}>
               {i === 0

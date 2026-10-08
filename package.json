@@ -32,7 +32,10 @@
     "test:messages": "node scripts/test-messages.mjs",
     "test:public": "node scripts/test-public.mjs",
     "public:assets": "node scripts/public-assets.mjs",
-    "test:site-quality": "node scripts/test-site-quality.mjs"
+    "test:site-quality": "node scripts/test-site-quality.mjs",
+    "seed": "pnpm local:seed && node scripts/seed-demo.mjs",
+    "test:m8": "node scripts/test-m8.mjs",
+    "test:fresh": "node scripts/test-fresh-migrations.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

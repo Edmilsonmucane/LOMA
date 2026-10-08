@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { deriveBrandTokens } from '@loma/ui/theme';
@@ -55,6 +56,14 @@ export default async function TenantLayout({
             path: '/app/settings/team',
           }))}
         >
+          {tenant.is_demo && (
+            <p className="demo-banner">
+              {t('demoBanner')}{' '}
+              {can(permissions, 'tenant.manage') && (
+                <Link href="/app/settings/demo">{t('demo')}</Link>
+              )}
+            </p>
+          )}
           {children}
         </AppShell>
       </div>

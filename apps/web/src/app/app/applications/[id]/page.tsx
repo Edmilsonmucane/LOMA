@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ScorePanel } from '@/components/score-panel';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { getTranslations } from 'next-intl/server';
@@ -261,7 +262,14 @@ export default async function ApplicationPage({
             )}
             <div>
               <dt>{t('riskScore')}</dt>
-              <dd>{t('scorePending')}</dd>
+              <dd>
+                <ScorePanel
+                  client={a.client_id}
+                  payment={quote.instalments
+                    .reduce((max, i) => (i.total > max ? i.total : max), 0n)
+                    .toString()}
+                />
+              </dd>
             </div>
           </dl>
           {c && (

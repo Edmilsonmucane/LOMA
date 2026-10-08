@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M7: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Cobranças, modelos, automações, campanhas e contactos interessados usam dados reais; envios têm consentimento, horário e custos auditáveis. Site público por tenant, temas Clássico/Moderno, simulador exacto, pedido em etapas com SMS/documentos privados e área do cliente estão implementados. Relatórios, scoring e demonstração completa entram em M8.
+M0–M8: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Cobranças, modelos, automações, campanhas e contactos interessados usam dados reais; envios têm consentimento, horário e custos auditáveis. Site público por tenant, temas Clássico/Moderno, simulador exacto, pedido em etapas com SMS/documentos privados e área do cliente estão implementados. Relatórios essenciais exportam PDF/CSV com valores exactos. O scoring tem critérios, limites e provisões editáveis. A demonstração inclui 120 clientes e 60 créditos e pode ser reposta sem apagar contratos ou auditoria.
 
 ## Instalar e correr
 
@@ -15,7 +15,7 @@ corepack enable
 pnpm install --frozen-lockfile
 pnpm services:start
 pnpm local:env
-pnpm local:seed
+pnpm seed
 pnpm dev
 ```
 
@@ -23,7 +23,7 @@ A instalação com imagens em cache demora habitualmente menos de 10 minutos; o 
 
 O painel da plataforma usa o host raiz na rota `/login`. O microcrédito de demonstração usa `demo.localhost:3000/login`; o segundo tenant usa `beira.localhost:3000/login`. O navegador deve resolver subdomínios de localhost (Chromium faz isso). As credenciais aleatórias dos utilizadores locais estão apenas em `.local/accounts.json`; abra esse ficheiro localmente, sem o partilhar ou colocar no Git. A seed é repetível e não redefine palavras-passe nem apaga dados existentes. Convites de equipa são capturados pelo Mailpit, porta 54324, sem enviar emails externos.
 
-`/design` mostra o catálogo de componentes durante desenvolvimento e devolve 404 em produção. A demonstração financeira com 120 clientes e `pnpm seed` será entregue em M8.
+`/design` mostra o catálogo de componentes durante desenvolvimento e devolve 404 em produção. A demonstração de vendas usa `demonstracao.localhost:3000/login` (utilizador local `sales`); `pnpm seed` preserva dados existentes. Consulte [Relatórios, score e demonstração](docs/REPORTS_SCORING_DEMO.md).
 
 ## Verificar
 
@@ -41,6 +41,8 @@ pnpm test:applications
 pnpm test:payments
 pnpm test:messages
 pnpm test:public
+pnpm test:m8
+pnpm test:fresh
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
