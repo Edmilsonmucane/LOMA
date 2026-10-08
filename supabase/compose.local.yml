@@ -27,7 +27,11 @@ services:
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres?sslmode=disable
       GOTRUE_SITE_URL: http://localhost:3000
       GOTRUE_URI_ALLOW_LIST: http://*.localhost:3000/auth/callback,http://localhost:3000/auth/callback
-      GOTRUE_DISABLE_SIGNUP: 'true'
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_EXTERNAL_PHONE_ENABLED: 'true'
+      GOTRUE_SMS_AUTOCONFIRM: 'false'
+      GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_SMS_URI: pg-functions://postgres/public/console_sms_hook
       GOTRUE_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
@@ -92,6 +96,15 @@ services:
     environment:
       COMMUNICATION_DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
     command: ['node', 'scripts/message-worker.mjs', '--watch']
+    volumes: ['../:/workspace/LOMA:ro']
+  auth-console:
+    image: node:24-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    working_dir: /workspace/LOMA
+    environment:
+      AUTH_CONSOLE_DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+    command: ['node', 'scripts/auth-console.mjs']
     volumes: ['../:/workspace/LOMA:ro']
   mail:
     image: axllent/mailpit:v1.22.3

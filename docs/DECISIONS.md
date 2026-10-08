@@ -106,6 +106,7 @@
 ## M6 — comunicação e cobranças
 
 - Escritas do pessoal continuam por sessão/RLS e RPC. Actividades de cobrança são append-only; atribuição e metas são dados editáveis. Escalões são configuração do tenant, distintos do score M8.
+
 - Fila persistente com chave idempotente, tentativas, agendamento, custo em centavos e eventos imutáveis. O worker técnico não expõe uma rota pública nem aceita SQL/payloads do navegador. Revalida consentimento, bloqueio de canal, contacto, limite e horário em cada tentativa; serializa por tenant e cliente.
 - Regras, modelos, horário e frequência são dados editáveis. Automações vêm desligadas; activar não envia acontecimentos antigos. Lembretes usam vencimentos e saldos reais após a tarefa financeira. Campanhas têm pré-visualização e contagem, mas destinatários são novamente filtrados no envio.
 - Credenciais cifradas com chave técnica separada em esquema privado; nunca são devolvidas ao pessoal. Provedor console funciona sem contas pagas. Integrações HTTP usam HTTPS, sem redireccionamentos e com defesa contra endereços privados. Aceitação pelo provedor e entrega confirmada são estados distintos.
@@ -122,3 +123,22 @@
 - Playwright completo: 57 passaram e um omitido (500 linhas em móvel, lote validado em computador). Os oito testes M6 foram repetidos após os ajustes finais; axe, teclado e ausência de overflow a 390px verificados.
 - Base vazia: 68 migrações, 34 tabelas públicas com RLS e protecção adicional do esquema privado. Produção local final com login, Hoje, cobranças/drawers, preview financeiro/campanha, todas as rotas M6, linha do tempo e catálogo recusado; nenhum erro de navegador.
 - Arranque cloud actualizado e guardado em rascunho, sem publicação/deploy. M7/M8, entrega externa, restauro cloud e ensaio com gestor real permanecem por validar; limites em PROGRESS.md/COMMUNICATIONS.md.
+
+## 2026-10-08 — M7
+
+- Site público renderizado no servidor, com simulador progressivo: campos/ranges enviam inputs e recebem cálculos do motor no servidor. Evita transportar o motor, bibliotecas de formulários e catálogo interno para o site. Templates Clássico/Moderno partilham estrutura; textos, imagem e ordem de secções são dados editáveis.
+- Clientes usam Supabase Auth nativo por telefone/código, com cookies separados dos do pessoal. Autenticação não concede membership. RPCs específicos conferem telefone confirmado, sessão, tenant e vínculo estável ao cliente; nunca há leitura de notas internas, configuração privada ou carteira alheia. Dados de pedido de clientes existentes são conservados como proposta para análise, sem sobrescrever a ficha do gestor.
+- Desenvolvimento usa hook PostgreSQL Send SMS do Auth e caixa privada de códigos no console. Produção usa um provedor SMS suportado pelo Supabase e CAPTCHA nativo configurado no Auth. Códigos não são devolvidos por API. CAPTCHA visual e limites por IP/telefone protegem a entrada local; confiança em IP encaminhado depende da configuração explícita do proxy de produção.
+- Documentos são enviados com JWT real do cliente, em caminhos reservados para um rascunho próprio. RLS do Storage confere propriedade e estado; sem service-role. Imagens são comprimidas no telemóvel; PDF conserva bytes. Ficheiros privados nunca entram na cache PWA.
+
+- O orçamento de JavaScript é a transferência inicial comprimida, incluindo recursos do framework e cabeçalhos, não apenas site.js. Lighthouse móvel com throttling simulado mede início e simulador sobre Next start; o comando falha abaixo de 90 ou a partir de 150 000 bytes. Provider de traduções apenas nos layouts internos, imagens públicas em HTML e CAPTCHA externo apenas no login reduzem a transferência sem remover validação ou acessibilidade.
+- Formulários pessoais só activam envio após hidratação/eventos e usam POST, impedindo submissão GET durante carregamento lento. Primeiro telefone na lista é o principal, independentemente de emails. Consulta de saldo actualiza encargos próprios até hoje com a rotina histórica M5; a versão financeira v1 permanece intacta.
+
+### Validação M7 — 8 out 2026
+
+- 169 testes unitários; v1 preservado, 90 testes financeiros com todas as métricas acima de 95%. Typecheck, lint, formatação e build verdes.
+- Auth/base/Storage reais: 45 verificações RLS, quatro grupos Clientes/500 linhas, 12 Pedidos, 15 Pagamentos, 14 Comunicações e 11 Site/Portal. Incluem vínculos estáveis, sessão expirada, telefone principal depois de email, código errado/correcto, reserva privada e pedido/aprovação/desembolso/pagamento real.
+- Playwright completo final: 63 passaram, um omitido (500 linhas em móvel, repetição do lote validado no computador). Os seis M7 passaram também isoladamente após corrigir a submissão durante carregamento lento.
+- Stack vazia temporária: 75 migrações, 37 tabelas públicas com RLS. Instalação congelada e arranque/env/seed repetidos preservaram dados; apenas volumes temporários de verificação foram removidos.
+- Produção local: temas 1440/390px, páginas públicas, OTP nativo, carteira própria/pagamento, axe AA, envio desactivado sem eventos, pessoal/editor e cache apenas offline. Lighthouse móvel: início 100/100, simulador 97/100; transferência JavaScript 147 528 bytes. Sem erros inesperados de navegador; catálogo recusado em produção.
+- Arranque cloud M7 guardado em rascunho, sem publicar/deploy. SMS externo/CAPTCHA alojado, restauro numa nova tarefa e ensaio com gestor real não foram executados. Próximo marco M8.

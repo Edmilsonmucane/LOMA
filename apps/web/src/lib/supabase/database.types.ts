@@ -742,6 +742,45 @@ export type Database = {
           },
         ];
       };
+      customer_accounts: {
+        Row: {
+          client_id: string;
+          created_at: string;
+          created_client: boolean;
+          tenant_id: string;
+          user_id: string;
+        };
+        Insert: {
+          client_id: string;
+          created_at?: string;
+          created_client?: boolean;
+          tenant_id: string;
+          user_id: string;
+        };
+        Update: {
+          client_id?: string;
+          created_at?: string;
+          created_client?: boolean;
+          tenant_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'customer_accounts_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'customer_accounts_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       journal_transactions: {
         Row: {
           branch_id: string;
@@ -1437,6 +1476,120 @@ export type Database = {
         };
         Relationships: [];
       };
+      portal_documents: {
+        Row: {
+          document_id: string;
+          draft_id: string;
+          tenant_id: string;
+          user_id: string;
+        };
+        Insert: {
+          document_id: string;
+          draft_id: string;
+          tenant_id: string;
+          user_id: string;
+        };
+        Update: {
+          document_id?: string;
+          draft_id?: string;
+          tenant_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'portal_documents_document_id_tenant_id_fkey';
+            columns: ['document_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'client_documents';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'portal_documents_draft_id_tenant_id_fkey';
+            columns: ['draft_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'portal_drafts';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      portal_drafts: {
+        Row: {
+          application_id: string | null;
+          branch_id: string;
+          client_id: string;
+          created_at: string;
+          data: Json;
+          id: string;
+          product_version_id: string;
+          revision: number;
+          tenant_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          application_id?: string | null;
+          branch_id: string;
+          client_id: string;
+          created_at?: string;
+          data: Json;
+          id: string;
+          product_version_id: string;
+          revision?: number;
+          tenant_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          application_id?: string | null;
+          branch_id?: string;
+          client_id?: string;
+          created_at?: string;
+          data?: Json;
+          id?: string;
+          product_version_id?: string;
+          revision?: number;
+          tenant_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'portal_drafts_application_id_tenant_id_fkey';
+            columns: ['application_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'applications';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'portal_drafts_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'portal_drafts_client_id_tenant_id_fkey';
+            columns: ['client_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'clients';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'portal_drafts_product_version_id_tenant_id_fkey';
+            columns: ['product_version_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'product_versions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'portal_drafts_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       presets: {
         Row: {
           configuration: Json;
@@ -1708,6 +1861,10 @@ export type Database = {
       };
       branch_allowed: { Args: { b: string; t: string }; Returns: boolean };
       cancel_campaign: { Args: { c: string; t: string }; Returns: undefined };
+      capture_public_lead: {
+        Args: { context: string; input: Json; signature: string; t: string };
+        Returns: string;
+      };
       cash_summary: { Args: { b: string; t: string }; Returns: Json };
       client_allowed: {
         Args: { c: string; p?: string; t: string };
@@ -1733,6 +1890,7 @@ export type Database = {
         Args: { did: string; t: string };
         Returns: boolean;
       };
+      console_sms_hook: { Args: { event: Json }; Returns: Json };
       create_campaign: {
         Args: {
           b: string;
@@ -1743,6 +1901,40 @@ export type Database = {
           segment: Json;
           t: string;
           template: string;
+        };
+        Returns: string;
+      };
+      customer_complete_document: {
+        Args: { did: string; t: string };
+        Returns: undefined;
+      };
+      customer_dashboard: { Args: { t: string }; Returns: Json };
+      customer_enter: { Args: { t: string }; Returns: string };
+      customer_object_allowed: {
+        Args: { object_path: string; upload?: boolean };
+        Returns: boolean;
+      };
+      customer_owns: { Args: { c: string; t: string }; Returns: boolean };
+      customer_reserve_document: {
+        Args: { d_id: string; metadata: Json; t: string };
+        Returns: Json;
+      };
+      customer_save_draft: {
+        Args: {
+          d_id: string;
+          expected_revision?: number;
+          input: Json;
+          t: string;
+        };
+        Returns: Json;
+      };
+      customer_submit: {
+        Args: {
+          context: string;
+          d_id: string;
+          expected_revision: number;
+          signature: string;
+          t: string;
         };
         Returns: string;
       };
@@ -1862,6 +2054,11 @@ export type Database = {
         };
         Returns: string;
       };
+      public_request_gate: {
+        Args: { context: string; signature: string; t: string };
+        Returns: undefined;
+      };
+      public_site: { Args: { tenant_slug: string }; Returns: Json };
       queue_message: {
         Args: {
           c: string;
@@ -1988,6 +2185,10 @@ export type Database = {
           t: string;
         };
         Returns: string;
+      };
+      save_public_site: {
+        Args: { expected: Json; settings: Json; t: string };
+        Returns: undefined;
       };
       search_applications: {
         Args: {

@@ -2,7 +2,7 @@
 
 ## Estrutura
 
-- apps/web: Next.js App Router, aplicação de gestão e futuro site público.
+- apps/web: Next.js App Router, aplicação de gestão, site público e área do cliente.
 - packages/ui: tokens CSS e componentes React acessíveis sobre Radix; conteúdo recebido por props.
 - packages/loan-engine: domínio financeiro puro implementado, sem UI ou base de dados; API documentada em LOAN_ENGINE.md.
 - supabase/migrations: esquema versionado e RLS a partir de M1.
@@ -84,3 +84,15 @@ O agendador executa a tarefa financeira antes de calcular lembretes. Automação
 Antes de contactar o provedor, o worker persiste o início como uncertain/dispatching. Uma interrupção não deixa uma mensagem já submetida pronta para reenvio automático. Resposta 429 permite retry/backoff configurado; timeout/5xx ficam uncertain para conferência. accepted não é delivered. Callbacks HMAC SHA-256 assinam os bytes exactos, isolam tenant/canal e deduplicam assinaturas; entrega e SAIR entram no histórico. O console é desenvolvimento e não comprova recepção num telemóvel.
 
 Local: contentor messages (Node 24) inicia com services:start, corre a cada 30 segundos e usa a ligação administrativa privada do stack de desenvolvimento. Produção exige um processo contínuo separado de Vercel, com COMMUNICATION_DATABASE_URL server-only; procedimento de endurecimento/recuperação em RECOVERY.md. Nenhuma sessão de negócio usa esta ligação. M7 acrescentará captura pública e M8 o score real; risk_class fica nullable até haver classificação registada.
+
+## M7 — Site e acesso de cliente
+
+Host validado → public_site expõe marca/site/agências e produtos publicados → Server Components/HTML → site.js solicita simulação v1 no servidor. O proxy injecta o caminho; o provider de tradução pertence exclusivamente aos layouts internos, evitando que o seu código e catálogo entrem no site público. O site usa um catálogo público pequeno, sem motor financeiro/browser SDK. Imagens com dimensões explícitas são HTML; CAPTCHA externo só carrega no login que dele precisa, após hidratação. PublicEnhancements carrega os eventos uma única vez por formulário. Botões de envio ficam desactivados até os eventos estarem ligados; formulários pessoais usam POST, evitando dados pessoais na query string.
+
+Portal usa Supabase Auth nativo telefone/código e cookies sb-loma-customer. customer_accounts liga utilizador Auth confirmado ao cliente por tenant; primeiro vínculo só pelo telefone principal. portal_drafts guarda dados propostos/revisão/pedido e portal_documents liga cada reserva a rascunho/autor. As três têm RLS; escrita por RPCs específicos. Não se alargam leituras directas de clients/client_events/applications/payments para clientes. customer_dashboard actualiza mora dos créditos próprios até hoje com a rotina financeira idempotente e devolve somente o resumo autorizado, sem notas internas; customer_submit entra no fluxo M4 com autor cliente e decisão independente.
+
+Storage usa JWT nativo, não identidade administrativa. A política de upload exige reserva do rascunho próprio ainda aberto; paths de staff pendentes não conferem autorização. Servidor limita bytes, confere tipo, reserva/envia/confirma, e modelo/validade ficam ligados à ficha da agência.
+
+portal_private tem chave separada de entrada, limites persistentes e caixa local de códigos. Contexto HMAC liga tenant/acção/telefone/instante/hash de IP; não é JWT nem autorização de negócio. CAPTCHA visual tem identificador/cookie próprios por imagem, evitando que respostas concorrentes troquem o desafio. Auth também precisa do CAPTCHA nativo em produção, pois o seu endpoint é público. Produção usa provedor SMS do Auth; local usa hook PostgreSQL e auth-console, só para desenvolvimento.
+
+Website é configuração editável/validada e auditada, com comparação optimista ao guardar. Aceitação de termos/privacidade é copiada no pedido; alterações posteriores do site não reescrevem o histórico. Service worker só guarda fallback público, sem dados/autenticação/ficheiros privados. Metadados/manifest são por host; domínio próprio continua reservado para fase seguinte.

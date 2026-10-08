@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M6: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Cobranças, modelos, automações, campanhas e contactos interessados usam dados reais; envios têm consentimento, horário e custos auditáveis. Site público e acabamento entram em M7–M8.
+M0–M7: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Cobranças, modelos, automações, campanhas e contactos interessados usam dados reais; envios têm consentimento, horário e custos auditáveis. Site público por tenant, temas Clássico/Moderno, simulador exacto, pedido em etapas com SMS/documentos privados e área do cliente estão implementados. Relatórios, scoring e demonstração completa entram em M8.
 
 ## Instalar e correr
 
@@ -40,6 +40,7 @@ pnpm test:clients
 pnpm test:applications
 pnpm test:payments
 pnpm test:messages
+pnpm test:public
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
@@ -116,10 +117,20 @@ O worker local corre com `pnpm services:start` e processa datas pendentes de for
 
 Abra **Cobranças** para ligar, enviar lembrete ou registar contacto, promessa/data/valor e visita. O gestor pode atribuir cobrador e meta por crédito. Escalões de atraso são editáveis em **Definições → Regras de comunicação**. A lista tem pesquisa, filtros por escalão/carteira própria e até 100 resultados por prioridade; mensagens/contactos mostram os 50 registos mais recentes.
 
-Em **Mensagens**, personalize modelos, active automações e crie campanhas com pré-visualização/contagem antes de enviar ou agendar. Sem consentimento não há envio; o opt-out é confirmado novamente no despacho. Na ficha do cliente, **Autorização de mensagens** bloqueia um canal ou regista a nova autorização explícita. Uma importação não cria consentimento. Contactos interessados só convertem com pedidos reais; a captura pública entra no M7 e o score no M8.
+Em **Mensagens**, personalize modelos, active automações e crie campanhas com pré-visualização/contagem antes de enviar ou agendar. Sem consentimento não há envio; o opt-out é confirmado novamente no despacho. Na ficha do cliente, **Autorização de mensagens** bloqueia um canal ou regista a nova autorização explícita. Uma importação não cria consentimento. Contactos interessados só convertem com pedidos reais; a captura pública está disponível no M7 e o score entra no M8.
 
 `pnpm services:start` inicia também o worker de mensagens; `pnpm messages:run` processa uma passagem e `pnpm messages:watch` inicia um processo contínuo. Não iniciar um segundo watch desnecessário. Sem contas pagas, console imprime mensagens **nos logs privados do worker**, sem enviar SMS/email reais. HTTP SMS/email e WhatsApp Cloud configuram-se em **Definições → Integrações**; credenciais cifradas nunca são devolvidas. WhatsApp exige modelo aprovado e ordem correcta das variáveis, incluindo a instrução para sair.
 
 `pnpm test:messages` usa PostgreSQL/Auth/RLS reais e mocks/console, após test:applications; pausa e retoma apenas o worker local de mensagens para ensaios determinísticos. Verifica dias, consentimento, campanhas, assinatura de callbacks, opt-out, janela/frequência, repetição/custos exactos, promessas, leads e isolamento. Nunca imprime credenciais ou mensagens com dados pessoais no relatório.
 
 Provedores confirmam entrega em `/api/message-webhooks/{tenant_id}/{channel}`. HTTP assina os bytes JSON com HMAC SHA-256 (hex) no cabeçalho `x-loma-signature`: `{id,status:"delivered"|"failed"}` ou `{from,message:"SAIR"}`. WhatsApp usa `x-hub-signature-256`, App Secret e verificação Meta com verifyToken. Configure estes segredos em Integrações. Respostas repetidas não duplicam eventos. Uma resposta incerta exige conferência no provedor; não é reenviada automaticamente.
+
+## Site público e cliente — M7
+
+O host do microcrédito abre o site, com os produtos publicados. Definições → Marca e site edita tema, textos, imagem, secções, termos/privacidade e limites; Marca edita identidade/cor/contacto/licença. Simulador usa as regras reais no servidor e mostra o custo total. Pedir crédito confirma telefone por código SMS, guarda rascunho a cada etapa e envia documentos pela câmara/ficheiro. O pedido aparece na agência para análise independente.
+
+Área do cliente usa cookies separados dos do pessoal e mostra os pedidos/créditos/prestações/extracto próprios. O desenvolvimento funciona sem contas pagas: Auth real emite códigos pelo hook console, visíveis apenas nos logs privados de auth-console. Nunca partilhar códigos/logs/traces. Produção requer SMS e CAPTCHA configurados no Supabase Auth, chave técnica pública no servidor e origem de IP confiável; ver [PUBLIC_SITE.md](docs/PUBLIC_SITE.md). O console não confirma entrega externa.
+
+`pnpm test:public` verifica o percurso real, RLS, Storage e isolamento de cliente/tenant; executar após as verificações M4/M5 e antes do navegador. PWA instala o site e oferece página offline, sem guardar dados pessoais. `pnpm public:assets` regenera os assets públicos a partir do catálogo/local SVG. Lighthouse e orçamento de JavaScript são medidos sobre build de produção; não medir o compilador de desenvolvimento como experiência final.
+
+Para medir o site: termine o servidor de desenvolvimento, execute `pnpm build`, inicie `pnpm --filter @loma/web start --port 3200` e, noutra sessão, `CHROME_PATH=/usr/bin/chromium pnpm test:site-quality`. O fixture vem de `test:public`; pode indicar um site público diferente com `PUBLIC_SITE_TEST_URL`. O comando verifica Lighthouse móvel ≥ 90 e transferência inicial de JavaScript < 150 000 bytes, incluindo o framework. Relatórios ficam privados em `.local/site-quality`; esta verificação também corre em CI.

@@ -77,3 +77,13 @@ Mensagens mostra texto, canal, custo exacto, tentativas, resultado e motivo leg�
 Configuração usa campos com rótulos, interruptores e estados de confirmação. Credenciais nunca reaparecem e são apagadas do formulário após guardar. Loading mantém a forma das linhas; erro permite tentar de novo. Listas quebram texto e agrupam acções a 390px, sem sombras ou decoração; drawers usam os primitivos acessíveis existentes.
 
 Validação M6: oito fluxos Playwright em computador/Pixel 7, scans axe e revisão visual em produção local a 1440/390px. Selects e interruptores têm alvos de pelo menos 44px; custos, metas e inputs monetários usam números tabulares. Pré-visualização de lembrete mostra prestação real e saída; campanha mostra apenas destinatários autorizados e texto antes de confirmar. Nenhum overflow da página ou erro de navegador detectado. Sem ensaio de usabilidade com gestor real.
+
+## M7 — Site e cliente
+
+Site com cabeçalho compacto, cinco secções ordenáveis, linhas finas e hierarquia editorial. Clássico usa Newsreader nos títulos; Moderno mantém Instrument Sans. Simulador tem poucos campos/ranges, custo total discriminado, aviso de prestação variável e uma acção primária. Produtos são linhas de conteúdo, sem ícones decorativos ou cartões repetidos com sombra.
+
+Pedido em quatro etapas, foco no título da etapa e gravação ao avançar. Código SMS, CAPTCHA legível, documentos pela câmara/ficheiro e confirmação de custos. Sessão e rascunho têm mensagens humanas de recuperação; autorização para contacto é expressa e distinta da aceitação do pedido. Área do cliente tem pedidos, créditos e próximos vencimentos, com extracto em disclosure. Editor mostra tema/textos/ordem antes de guardar e explica o efeito no site.
+
+Site usa HTML inicial e JavaScript funcional pequeno, sem transportar motor/formulários internos. Skeletons internos existentes permanecem; público apresenta conteúdo renderizado no servidor. Alvos de 44px, foco visível, reduced motion e layout móvel sem grelhas decorativas. Prestação principal tem moeda menor/secundária, incluindo actualização da simulação. Botões de envio aguardam os eventos; formulários pessoais usam POST.
+
+Validação M7: temas Clássico/Moderno revistos em produção a 1440/390px; pedido, simulador, login/cliente e editor com scans axe AA, teclado e ausência de overflow. Lighthouse móvel: início 100/100, simulador 97/100 (desempenho/acessibilidade), transferência inicial de JavaScript 147 528 bytes, incluindo o framework. Sem ensaio com leitor de ecrã ou gestor real; detalhes e limites em PROGRESS.md.

@@ -19,6 +19,7 @@ jobs:
       - run: pnpm test:applications
       - run: pnpm test:payments
       - run: pnpm test:messages
+      - run: pnpm test:public
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
@@ -27,3 +28,13 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - run: pnpm build
+      - name: Mobile public site quality
+        run: |
+          pnpm --filter @loma/web start --port 3200 > .local/site-quality-server.log 2>&1 &
+          site_server_pid=$!
+          trap 'kill "$site_server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3200/ >/dev/null; then break; fi
+            sleep 1
+          done
+          pnpm test:site-quality

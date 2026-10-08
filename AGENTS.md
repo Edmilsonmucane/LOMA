@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M6)
+## Comandos (M0–M7)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -24,6 +24,9 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm test:clients (base/Auth/Storage reais e lote de 500)
 - pnpm test:applications (pedidos/contratos/desembolso e RLS reais)
 - pnpm test:payments (pagamentos/recibos/mora/caixa/razão e RLS reais; após test:applications)
+- pnpm test:public (site/cliente/Auth/Storage reais; após test:applications, antes de Playwright)
+- pnpm public:assets
+- pnpm test:site-quality (servidor de produção na porta 3200; Lighthouse móvel e orçamento JS)
 - pnpm test:messages (comunicações/campanhas/cobranças reais; após test:applications)
 - pnpm messages:run / pnpm messages:watch
 - pnpm backfill:local (planos históricos sem repor a base)
@@ -65,3 +68,7 @@ Chave FINANCIAL_SIGNING_KEY apenas no servidor e financial_private.signing_key. 
 ## Comunicação e cobranças (M6)
 
 Credenciais apenas cifradas em communication_private; nunca devolver ou imprimir token/callback secret. Sessões operacionais usam RPC/RLS, nunca a ligação técnica do worker. Custos são strings de centavos. Consentimento e opt-out são conferidos no enqueue e no despacho; uma edição normal não remove bloqueios. Não chamar accepted de delivered. Persistir uncertain/dispatching antes do provedor; interrupção/timeout não pode gerar reenvio automático. Retry apenas em rejeição explícita, com backoff editável. DNS público fixado na ligação TLS, sem destinos privados/redireccionamentos. Callbacks exigem HMAC dos bytes exactos, tenant/canal e deduplicação. Não correr serviços/seed/testes de base durante Playwright; test:messages pausa/retoma apenas o worker que encontrou activo.
+
+## Site e cliente (M7)
+
+Ler docs/PUBLIC_SITE.md. portalDb usa sb-loma-customer, separado do pessoal. Autenticação de telefone não concede membership. customer_owns e RPCs conferem Auth/sessão/tenant/vínculo; nunca permitir notas internas ou carteira alheia na área do cliente. Dados de ficha existente são proposta, não edição automática. Upload só em path reservado num rascunho próprio, com JWT do cliente e RLS do Storage. PUBLIC_REQUEST_SIGNING_KEY é separada das chaves de finanças/integrações, nunca impressa. Console SMS local contém códigos temporários e só pode ser lido em contexto privado de desenvolvimento/teste. CAPTCHA/provedor Auth alojados precisam de configuração própria. Nenhum API/documento/ecrã pessoal entra na cache PWA. Não alterar v1 para criar o simulador público.

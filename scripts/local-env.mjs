@@ -11,10 +11,16 @@ const file = 'apps/web/.env.local';
 const database = new pg.Client({ connectionString: status.DB_URL });
 await database.connect();
 let signingKey;
+let publicKey;
 try {
   signingKey = (
     await database.query(
       'select secret from financial_private.signing_key where id',
+    )
+  ).rows[0].secret;
+  publicKey = (
+    await database.query(
+      'select secret from portal_private.request_key where id',
     )
   ).rows[0].secret;
 } finally {
@@ -22,6 +28,7 @@ try {
 }
 const desired = {
   FINANCIAL_SIGNING_KEY: signingKey,
+  PUBLIC_REQUEST_SIGNING_KEY: publicKey,
   NEXT_PUBLIC_SUPABASE_URL: status.API_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: status.ANON_KEY,
   SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,

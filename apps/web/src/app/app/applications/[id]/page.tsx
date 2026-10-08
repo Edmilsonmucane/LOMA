@@ -15,6 +15,7 @@ import {
   paymentCapacity,
 } from '@/lib/domain/applications';
 import { formatDate } from '@/lib/domain/dates';
+import { publicDraftSchema } from '@/lib/domain/public-site';
 import { ApplicationControls } from '@/components/application-controls';
 import { ApplicationEditor } from '@/components/application-editor';
 import { LoanPlan } from '@/components/loan-plan';
@@ -37,6 +38,14 @@ export default async function ApplicationPage({
     .eq('id', id)
     .maybeSingle();
   if (!a) notFound();
+  const pub = await getTranslations('Public');
+  const { data: proposal } = await db
+    .from('portal_drafts')
+    .select('data')
+    .eq('tenant_id', tenant.id)
+    .eq('application_id', id)
+    .maybeSingle();
+  const proposed = publicDraftSchema.strip().safeParse(proposal?.data);
   const [
     { data: c },
     { data: v },
@@ -119,6 +128,47 @@ export default async function ApplicationPage({
       <Link className="back-link" href="/app/applications">
         {t('back')}
       </Link>
+      {proposed.success && (
+        <section className="detail-panel">
+          <h2>{pub('proposedData')}</h2>
+          <p className="ui-help">{pub('proposedHelp')}</p>
+          <dl className="detail-grid">
+            <div>
+              <dt>{pub('name')}</dt>
+              <dd>{proposed.data.name}</dd>
+            </div>
+            {(
+              [
+                'province',
+                'district',
+                'neighbourhood',
+                'address',
+                'activity',
+                'employer',
+                'income',
+                'expenses',
+              ] as const
+            ).map((key) => (
+              <div key={key}>
+                <dt>{pub(key)}</dt>
+                <dd>
+                  {['income', 'expenses'].includes(key)
+                    ? formatMoney(BigInt(proposed.data.profile[key]))
+                    : proposed.data.profile[key]}
+                </dd>
+              </div>
+            ))}
+            <div>
+              <dt>{pub('identityNumber')}</dt>
+              <dd>
+                {proposed.data.profile.identities
+                  .map((i) => `${i.kind.toUpperCase()}: ${i.value}`)
+                  .join(' · ')}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      )}
       <div className="page-heading">
         <div>
           <h1>{snap?.client.name ?? c?.name ?? t('clientRestricted')}</h1>

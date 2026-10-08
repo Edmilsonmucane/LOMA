@@ -11,6 +11,7 @@ export default async function SettingsPage() {
     ['integrations', 'integrationsHelp', 'tenant.manage'],
     ['documents', 'documentsHelp', 'tenant.manage'],
     ['brand', 'brandHelp', 'tenant.manage'],
+    ['site', 'siteHelp', 'tenant.manage'],
     ['team', 'teamHelp', 'users.manage'],
     ['branches', 'branchesHelp', 'users.manage'],
     ['security', 'securityHelp', 'tenant.manage'],

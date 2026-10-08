@@ -4,6 +4,7 @@ import { deriveBrandTokens } from '@loma/ui/theme';
 import { getTenantContext } from '@/lib/context';
 import { can } from '@/lib/domain/tenancy';
 import { AppShell } from '@/components/app-shell';
+import { InternalIntlLayout } from '@/components/internal-intl';
 export default async function TenantLayout({
   children,
 }: {
@@ -28,33 +29,35 @@ export default async function TenantLayout({
         .limit(100)
     : { data: [] };
   return (
-    <div
-      style={
-        {
-          '--accent': brand.accent,
-          '--on-accent': brand.onAccent,
-          '--accent-hover': brand.accentHover,
-          '--accent-soft': brand.accentSoft,
-        } as CSSProperties
-      }
-    >
-      <AppShell
-        name={tenant.name}
-        logoUrl={tenant.logo_url}
-        footer={tenant.footer}
-        person={membership?.display_name ?? user.email ?? ''}
-        branch={branch?.name ?? t('allBranches')}
-        canManage={can(permissions, 'users.manage')}
-        canAudit={can(permissions, 'audit.read')}
-        permissions={permissions}
-        searchItems={(team ?? []).map((item) => ({
-          id: item.id,
-          label: item.display_name,
-          path: '/app/settings/team',
-        }))}
+    <InternalIntlLayout>
+      <div
+        style={
+          {
+            '--accent': brand.accent,
+            '--on-accent': brand.onAccent,
+            '--accent-hover': brand.accentHover,
+            '--accent-soft': brand.accentSoft,
+          } as CSSProperties
+        }
       >
-        {children}
-      </AppShell>
-    </div>
+        <AppShell
+          name={tenant.name}
+          logoUrl={tenant.logo_url}
+          footer={tenant.footer}
+          person={membership?.display_name ?? user.email ?? ''}
+          branch={branch?.name ?? t('allBranches')}
+          canManage={can(permissions, 'users.manage')}
+          canAudit={can(permissions, 'audit.read')}
+          permissions={permissions}
+          searchItems={(team ?? []).map((item) => ({
+            id: item.id,
+            label: item.display_name,
+            path: '/app/settings/team',
+          }))}
+        >
+          {children}
+        </AppShell>
+      </div>
+    </InternalIntlLayout>
   );
 }
