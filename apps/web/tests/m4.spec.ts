@@ -230,7 +230,9 @@ test('request → independent approval → contract PDF → manual disbursement'
   await expect(
     page.getByRole('heading', { name: fixture.name, exact: true }),
   ).toBeVisible();
-  await expect(page.getByText('16 000,00 MT', { exact: true })).toBeVisible();
+  await expect(
+    page.locator('.payment-summary').getByText('16 000,00 MT', { exact: true }),
+  ).toBeVisible();
   expect(
     (
       await new AxeBuilder({ page })

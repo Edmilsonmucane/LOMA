@@ -59,7 +59,30 @@ Limites: importação é de clientes CSV UTF-8, sem substituir fichas ou inferir
 
 ## Próximos marcos
 
-M4: pedidos, aprovação, contrato PDF, snapshot e desembolso.
-M5–M8: pagamentos, caixa, comunicações, site público, relatórios e acabamento.
+M6: cobranças, mensagens, automações e campanhas.
+M7: site público e área do cliente.
+M8: relatórios, scoring, demonstração e acabamento.
 
-Isolamento, documentos privados, importação e cobertura do motor estão comprovados. O fluxo financeiro completo e Lighthouse do site público aguardam os respectivos marcos; a plataforma financeira não está concluída.
+Isolamento, documentos privados, importação e cobertura do motor estão comprovados. Mensagens, site público e o fluxo completo desde o cliente aguardam M6–M8; a Fase 1 ainda não está concluída.
+
+## M4 — Pedidos e contratos
+
+Aceite em 7 out 2026; commit dabe1bd. Pedidos/análise/decisão independente, requisitos configurados, snapshot imutável, contrato PDF privado e desembolso manual com datas, assinatura declarada e limites. Ver docs/DECISIONS.md para as verificações completas. A regressão M4 continua verde no M5.
+
+## M5 — Pagamentos, caixa e Hoje
+
+Aceite em 8 out 2026 após as verificações abaixo.
+
+- Preview/gravação reais com cascata do snapshot, pagamentos parciais, excedentes, revisão/dia esperado e chave idempotente. Recibo, número sequencial, saldos, razão e histórico são uma transacção; estorno motivado conserva o original e repõe componentes hoje.
+- Recibo PDF com fonte incorporada, modelo editável/snapshot e QR de acesso autenticado, auditoria e no-store. Modelos aplicam-se apenas a novos recibos. Seis métodos; numerário exige caixa aberto e fundos suficientes.
+- Caixa por agência, abertura, depósitos, contagem/fecho e diferenças motivadas. Razão equilibrado e imutável, conciliação exacta com carteira e numerário; abertura não duplica o saldo do dia anterior. Novo desembolso materializa plano e razão atomicamente.
+- Mora exacta por intervalos e multa única, snapshot/tolerância, idempotência e estados reais. Worker local verificado; pg_cron registado quando disponível em produção. Datas pendentes apenas, sem auditoria redundante. Backfill histórico preserva contratos v1.
+- Hoje: quatro números reais e atenção por vencimento com Ligar/pagamento; permissões respeitadas. Atalhos de caixa e paleta; escolha de cliente abre drawer de pagamento, sem acrescentar itens à navegação. Créditos mostram prestações por pagar, saldo, saldo a favor e extracto; eventos entram na ficha de cliente.
+
+- Validação: typecheck, lint, formatação e build passaram; 146 testes unitários e motor com cobertura 98,17% instruções / 98,39% ramos / 100% funções / 99,28% linhas, incluindo 3 000 combinações.
+- Base/Auth reais: 36 verificações RLS, quatro grupos de clientes/Storage/lote de 500, 12 de pedidos e 15 de pagamentos/caixa/razão. Tarefa automática real, continuidade de numerário entre dias, recibos sem lacunas, rollback/concorrência, mora/parciais/excedentes e integridade do journal comprovados.
+- Playwright completo: 49 passaram, um omitido (lote de 500 repetido em móvel). M4/M5 foram repetidos após o ajuste visual: 12 passaram; seis M5 novamente após valores principais com moeda menor. Incluem escolha de cliente → valor/método → confirmar, PDF/RLS, estorno, caixa, axe e ausência de overflow.
+- Stack temporária vazia: 39 migrações, 28 tabelas públicas com RLS; somente recursos temporários foram removidos. Instalação congelada e arranque/seed repetidos preservaram dados.
+- Produção local final: login real, Hoje, saldo/preview, recibo PDF privado com QR, caixa/modelos e móvel 390px; /design 404, sem erros de navegador. Fonte PDF traçada para deploy; chave financeira ausente dos assets do cliente. Texto do recibo/valor e imagem QR conferidos; revisão visual desktop/mobile, valores sem quebra e acções com espaço.
+
+Limites: não foi publicado um deploy alojado nem validada restauração numa nova tarefa cloud. pg_cron, chave do servidor, backfill e backup de produção estão documentados; a execução verificada é local. O arranque cloud foi guardado em rascunho e precisa de revisão/gravação/publicação nas definições. Registos retroactivos não estão activos; pagamentos/estornos usam a data efectiva actual. Mensagens/cobranças M6, site/cliente M7 e relatórios/scoring/demonstração M8 permanecem por entregar. Não foi efectuado um ensaio com gestor real.

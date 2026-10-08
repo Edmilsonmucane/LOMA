@@ -59,3 +59,11 @@ Lista com pesquisa por cliente/número, filtro por estado e alternativa quadro; 
 Contrato PDF privado, Instrument Sans incorporada, linhas e margens generosas; montantes exactos, taxa efectiva anual e plano paginado. Modelo em linguagem editável pelo gestor; efeito limitado a novas aprovações indicado junto ao formulário. Desembolso num drawer com data contratual, assinatura, método, referência e confirmação do efeito. Estado vazio com próxima acção, skeletons com forma de linhas e foco/teclado dos primitivos existentes.
 
 Validação final M4: revisão visual em produção a 1440px e 390px, PDF e scans axe do pedido/drawer/crédito/modelo em computador/Pixel 7. Plano usa região com foco por teclado e scroll local; dinheiro não quebra entre linhas. Ecrãs encerrados não mostram um painel de acções vazio. O teste do catálogo aguarda a animação de entrada antes de medir contraste, sem mudar o limite AA.
+
+## M5 — Dinheiro diário
+
+Hoje tem quatro números reais, sem gráficos; lista ordenada por vencimento com Ligar e Registar pagamento. Valores sem permissão dizem Sem acesso. Caixa é um atalho, sem acrescentar itens à navegação principal. A paleta encontra Registar pagamento e Caixa. A escolha do cliente abre o drawer, seguido de valor/método e conferência com cascata legível.
+
+Saldo, saldo a favor e prestações por pagar dominam o detalhe do crédito; plano original fica em disclosure e contrato privado. Extracto mantém recibos estornados. Caixa usa contagem de numerário e diferença viva, motivo quando necessário. Tabelas têm scroll local, alvos de 44px, foco e rótulos. Fluxos de pagamentos/caixa foram verificados por teclado/axe e a 390px.
+
+Saldos importantes usam 28px e MT menor/secundário, sem perder o formato exacto. Acções agrupadas têm 12px de espaço. Prestações e caixa preservam dinheiro/datas numa linha com scroll local; revisão final em produção a 1440/390px.

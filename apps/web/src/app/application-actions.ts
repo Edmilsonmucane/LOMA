@@ -1,5 +1,6 @@
 'use server';
 import { z } from 'zod';
+import { attestContract } from '@/lib/financial-plan';
 import { revalidatePath } from 'next/cache';
 import { requirePermission } from '@/lib/context';
 import {
@@ -16,11 +17,15 @@ function result(error: { code: string } | null, data?: string | null) {
     return {
       ok: false as const,
       error:
-        error.code === 'PT409'
-          ? 'stale'
-          : error.code === '42501'
-            ? 'denied'
-            : 'invalid',
+        error.code === 'PT412'
+          ? 'cashRequired'
+          : error.code === 'PT413'
+            ? 'cashInsufficient'
+            : error.code === 'PT409'
+              ? 'stale'
+              : error.code === '42501'
+                ? 'denied'
+                : 'invalid',
     };
   for (const path of ['/app/applications', '/app/loans', '/app/clients'])
     revalidatePath(path, 'layout');
@@ -76,11 +81,19 @@ export async function transitionApplication(input: unknown) {
   return result(error, data);
 }
 export async function disburseApplication(input: unknown) {
-  const { db, tenant } = await requirePermission('loans.disburse');
+  const { db, tenant, user } = await requirePermission('loans.disburse');
   const parsed = disbursementSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: 'invalid' };
   const x = parsed.data;
+  const { data: contract } = await db
+    .from('contracts')
+    .select('*')
+    .eq('tenant_id', tenant.id)
+    .eq('application_id', x.id)
+    .maybeSingle();
+  if (!contract) return { ok: false as const, error: 'invalid' };
   const { data, error } = await db.rpc('disburse_application', {
+    ...attestContract(tenant.id, user.id, contract),
     t: tenant.id,
     a_id: x.id,
     expected_revision: x.revision,

@@ -1,98 +1,93 @@
 import Link from 'next/link';
+import { MoneyText } from '@/components/money-text';
 import { getTranslations } from 'next-intl/server';
 import { getTenantContext } from '@/lib/context';
 import { can } from '@/lib/domain/tenancy';
-import { Badge } from '@loma/ui';
+import { todaySchema } from '@/lib/domain/payments';
+import { formatMoney } from '@loma/loan-engine';
+import { formatDate } from '@/lib/domain/dates';
 export default async function TodayPage() {
   const { db, tenant, permissions } = await getTenantContext();
-  const t = await getTranslations('App');
-  const [{ count: branches }, { count: team }, { count: products }] =
-    await Promise.all([
-      db
-        .from('branches')
-        .select('id', { count: 'exact', head: true })
-        .eq('tenant_id', tenant.id),
-      db
-        .from('memberships')
-        .select('id', { count: 'exact', head: true })
-        .eq('tenant_id', tenant.id)
-        .eq('active', true),
-      db
-        .from('products')
-        .select('id', { count: 'exact', head: true })
-        .eq('tenant_id', tenant.id)
-        .eq('status', 'draft'),
-    ]);
+  const t = await getTranslations('Today');
+  const d = await getTranslations('Dates');
+  const months = Array.from({ length: 12 }, (_, i) => d(`months.${i}`));
+  const { data, error } = await db.rpc('today_summary', { t: tenant.id });
+  if (error) throw new Error('Today summary unavailable');
+  const s = todaySchema.parse(data);
   return (
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">{t('nav.today')}</p>
-          <h1>{t('prepareTitle')}</h1>
-          <p>{t('prepareHelp')}</p>
+          <h1>{t('title')}</h1>
+          <p>{t('help')}</p>
         </div>
-        {can(permissions, 'tenant.manage') && (
-          <Link
-            className="ui-button ui-button-primary"
-            href="/app/settings/brand"
-          >
-            {t('personalize')}
+        {(can(permissions, 'cash.manage') ||
+          can(permissions, 'reports.read')) && (
+          <Link className="ui-button ui-button-secondary" href="/app/cash">
+            {t('cashView')}
           </Link>
         )}
       </div>
-      <div className="setup-summary">
-        <div>
-          <span>{t('branches')}</span>
-          <strong className="numeric">{branches ?? 0}</strong>
-        </div>
-        <div>
-          <span>
-            {t(can(permissions, 'users.manage') ? 'activeUsers' : 'yourAccess')}
-          </span>
-          <strong className="numeric">{team ?? 0}</strong>
-        </div>
-        <div>
-          <span>{t('draftProducts')}</span>
-          <strong className="numeric">{products ?? 0}</strong>
-        </div>
+      <div className="today-summary">
+        {(['due', 'overdue', 'pending', 'disbursed'] as const).map((k) => (
+          <div key={k}>
+            <span>{t(k)}</span>
+            <strong className="numeric">
+              {s[k] === null ? (
+                t('unavailable')
+              ) : k === 'pending' ? (
+                s.pending
+              ) : (
+                <MoneyText text={formatMoney(BigInt(s[k] ?? '0'))} />
+              )}
+            </strong>
+          </div>
+        ))}
       </div>
-      <section className="setup-list" aria-labelledby="setup-title">
-        <h2 id="setup-title">{t('setupTitle')}</h2>
-        <div>
-          <span>
-            <strong>{t('brand')}</strong>
-            <p>{t('brandHelp')}</p>
-          </span>
-          {can(permissions, 'tenant.manage') ? (
-            <Link href="/app/settings/brand">{t('review')}</Link>
-          ) : (
-            <Badge>{t('managerTask')}</Badge>
-          )}
-        </div>
-        <div>
-          <span>
-            <strong>{t('team')}</strong>
-            <p>{t('teamHelp')}</p>
-          </span>
-          {can(permissions, 'users.manage') ? (
-            <Link href="/app/settings/team">{t('review')}</Link>
-          ) : (
-            <Badge>{t('managerTask')}</Badge>
-          )}
-        </div>
-        <div>
-          <span>
-            <strong>{t('products')}</strong>
-            <p>{t('productsHelp')}</p>
-          </span>
-          {can(permissions, 'tenant.manage') ? (
-            <Link href="/app/settings/products">{t('review')}</Link>
-          ) : (
-            <Badge>{t('managerTask')}</Badge>
-          )}
-        </div>
+      <section className="client-section">
+        <h2>{t('attention')}</h2>
+        {s.pending !== null && s.pending > 0 && (
+          <div className="attention-row">
+            <strong>
+              {t('pending')}: {s.pending}
+            </strong>
+            <Link
+              className="ui-button ui-button-secondary"
+              href="/app/applications"
+            >
+              {t('reviewApplications')}
+            </Link>
+          </div>
+        )}
+        {!s.attention.length && <p className="ui-help">{t('empty')}</p>}
+        {s.attention.map((r) => (
+          <div className="attention-row" key={r.id}>
+            <span>
+              <strong>{r.name}</strong>
+              <p>
+                {formatMoney(BigInt(r.amount))} ·{' '}
+                {formatDate(r.due_date, months)}
+              </p>
+            </span>
+            <div className="form-actions">
+              {r.phone && /^\+?[0-9 ]+$/.test(r.phone) && (
+                <a
+                  className="ui-button ui-button-secondary"
+                  href={`tel:${r.phone.replaceAll(' ', '')}`}
+                >
+                  {t('call')}
+                </a>
+              )}
+              <Link
+                className="ui-button ui-button-primary"
+                href={`/app/loans/${r.id}${can(permissions, 'payments.manage') ? '?payment=1' : ''}`}
+              >
+                {t(can(permissions, 'payments.manage') ? 'payment' : 'loan')}
+              </Link>
+            </div>
+          </div>
+        ))}
       </section>
-      <p className="ui-help initial-note">{t('initialNote')}</p>
     </>
   );
 }

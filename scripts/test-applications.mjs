@@ -1,3 +1,5 @@
+import { engine } from './engine-runtime.mjs';
+import { attestPlan } from './financial-plan.mjs';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -291,7 +293,27 @@ try {
       );
     },
   );
+  const storedContract = (
+    await db.query('select * from public.contracts where id=$1', [contract])
+  ).rows[0];
+  const sc = storedContract.snapshot;
+  const plan = engine.simulate({
+    principal: BigInt(sc.principal),
+    periods: sc.periods,
+    startDate: sc.startDate,
+    terms: sc.terms,
+  });
+  const key = (
+    await db.query('select secret from financial_private.signing_key where id')
+  ).rows[0].secret;
   const disburse = {
+    ...attestPlan({
+      tenant: t,
+      contract,
+      actor: accounts.cashier.id,
+      plan,
+      key,
+    }),
     t,
     a_id: a,
     expected_revision: 4,

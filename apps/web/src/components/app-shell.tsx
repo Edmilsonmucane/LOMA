@@ -52,6 +52,8 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   const t = useTranslations('App');
+  const p = useTranslations('Payments');
+  const cash = useTranslations('Cash');
   const path = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -239,6 +241,26 @@ export function AppShell({
                       id: 'audit',
                       label: t('audit'),
                       onSelect: () => router.push('/app/settings/audit'),
+                    },
+                  ]
+                : []),
+              ...(can(permissions, 'payments.manage') &&
+              can(permissions, 'loans.read')
+                ? [
+                    {
+                      id: 'register-payment',
+                      label: p('register'),
+                      onSelect: () => router.push('/app/loans?payment=1'),
+                    },
+                  ]
+                : []),
+              ...(can(permissions, 'cash.manage') ||
+              can(permissions, 'reports.read')
+                ? [
+                    {
+                      id: 'cash',
+                      label: cash('title'),
+                      onSelect: () => router.push('/app/cash'),
                     },
                   ]
                 : []),

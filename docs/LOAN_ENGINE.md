@@ -23,3 +23,7 @@ pnpm test:engine exige ≥95% em instruções, ramos, funções e linhas. Vector
 ## Contratos históricos (M4)
 
 O motor desta fase permanece em `src/v1.ts`; `src/index.ts` reexporta a API e fornece `simulateContract(version, input)`. Contratos imutáveis guardam `engine_version=1`, principal/prazo/data/condições. Cálculos históricos são sempre projectados pela versão correspondente, sem aceitar totais do cliente. Uma mudança no comportamento financeiro exige v2 preservando v1. Cobertura inclui o motor financeiro completo v1 e o dispatch histórico. Versão suportada/desconhecida é testada no pacote puro; snapshot e texto são também testados no domínio de contratos.
+
+## Persistência e pagamentos — M5
+
+v1 permanece sem alterações. O servidor projecta e atesta o plano; a base materializa principal/juros exactos por vencimento e uma linha inicial para encargos separados. Dinheiro não atravessa JSON como Number. A cascata SQL usa as condições do contrato e saldos reais, comparada com allocatePayment no teste de integração. Mora guarda acumulador numeric exacto e centavos apurados, contando apenas dias posteriores à tolerância sobre capital/juros por pagar; intervalos são fechados antes de pagamentos/estornos. O exemplo 7 × 0,5% × 266 667 centavos continua a dar 9 333 centavos. Não arredondar cada dia isoladamente. O último vencimento e diferenças do plano original continuam preservados.

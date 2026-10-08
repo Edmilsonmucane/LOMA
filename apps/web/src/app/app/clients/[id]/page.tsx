@@ -248,6 +248,9 @@ export default async function ClientPage({
           {(events ?? []).map((event) => {
             const detail = event.detail as {
               application_id?: string;
+              loan_id?: string;
+              amount?: string;
+              reason?: string;
               status?: string;
               note?: string;
               title?: string;
@@ -276,6 +279,16 @@ export default async function ClientPage({
                       <Link href={`/app/applications/${detail.application_id}`}>
                         {applications(`states.${detail.status}`)}
                       </Link>
+                    </p>
+                  )}
+                  {detail.loan_id && (
+                    <p>
+                      <Link href={`/app/loans/${detail.loan_id}`}>
+                        {detail.amount
+                          ? formatMoney(BigInt(detail.amount))
+                          : applications('loans')}
+                      </Link>
+                      {detail.reason && <> · {detail.reason}</>}
                     </p>
                   )}
                   {detail.note && <p>{detail.note}</p>}

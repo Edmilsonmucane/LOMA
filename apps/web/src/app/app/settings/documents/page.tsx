@@ -1,3 +1,5 @@
+import { ReceiptTemplateEditor } from '@/components/payment-controls';
+import { receiptTemplateSchema } from '@/lib/domain/payments';
 import { getTranslations } from 'next-intl/server';
 import { requirePermission } from '@/lib/context';
 import { templateSchema } from '@/lib/domain/applications';
@@ -13,6 +15,20 @@ export default async function DocumentsPage() {
     .eq('key', 'contract')
     .single();
   const s = templateSchema.parse(data?.value);
+  const p = await getTranslations('Payments');
+  const { data: receipt } = await db
+    .from('tenant_configuration')
+    .select('value')
+    .eq('tenant_id', tenant.id)
+    .eq('category', 'document')
+    .eq('key', 'receipt')
+    .maybeSingle();
+  const receiptValue = receiptTemplateSchema.parse(
+    receipt?.value ?? {
+      title: p('receiptDefaultTitle'),
+      body: p.raw('receiptDefaultBody'),
+    },
+  );
   return (
     <>
       <div className="page-heading">
@@ -25,6 +41,12 @@ export default async function DocumentsPage() {
         <ContractTemplateEditor
           title={s.title}
           body={s.body.replaceAll('\\n', '\n')}
+        />
+      </div>
+      <div className="settings-form-panel">
+        <ReceiptTemplateEditor
+          title={receiptValue.title}
+          body={receiptValue.body}
         />
       </div>
     </>

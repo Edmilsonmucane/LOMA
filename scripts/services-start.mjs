@@ -102,6 +102,9 @@ try {
   execFileSync(process.execPath, ['scripts/migrate-local.mjs'], {
     stdio: 'inherit',
   });
+  execFileSync(process.execPath, ['scripts/backfill-loans.mjs'], {
+    stdio: 'inherit',
+  });
   console.log(
     'Local PostgreSQL, Supabase Auth, PostgREST, private Storage and mail are ready.',
   );

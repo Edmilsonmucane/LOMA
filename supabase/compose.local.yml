@@ -73,6 +73,17 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: 'false'
     volumes:
       - loma-storage:/var/lib/storage
+  daily:
+    image: postgres:17-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: ${LOMA_LOCAL_DB_PASSWORD}
+    command: ['sh', '/runtime/daily.sh']
+    volumes: ['../scripts/daily-local.sh:/runtime/daily.sh:ro']
   mail:
     image: axllent/mailpit:v1.22.3
     ports: ['127.0.0.1:54324:8025']

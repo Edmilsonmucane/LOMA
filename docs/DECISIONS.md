@@ -82,3 +82,23 @@
 - Stack temporária nova com PostgreSQL/Auth/Storage oficiais: 28 migrações aplicadas e 20 tabelas com RLS. Apenas os recursos temporários foram removidos; a base de trabalho foi preservada.
 - Produção local: login → pedido → PDF privado → crédito/móvel, `/design` recusado e nenhum erro de navegador. Fonte PDF incluída no trace de deploy; texto extraído conferiu total, juros, última prestação e taxa anual. Revisão visual em 1440/390px e PDF; tabelas com scroll local e foco, sem cartões de controlo vazios.
 - Próximo marco: M5 — pagamentos, recibos, estornos, caixa/razão, tarefas diárias e Hoje. Deploy alojado, scoring M8 e site/cliente M7 não foram declarados concluídos.
+
+## 2026-10-08 — M5
+
+- O plano histórico é calculado exclusivamente no servidor com v1 e atestado por HMAC (tenant, contrato imutável, funcionário e validade de cinco minutos). A chave vive no esquema privado da base e no ambiente do servidor, nunca no navegador. O RPC verifica a assinatura; autorização, datas, revisão e RLS continuam a ser verificadas independentemente. Evita duplicar o motor histórico em SQL ou confiar num plano enviado pelo cliente.
+- SQL é a autoridade de imputação e saldos. Preview e gravação usam a mesma cascata do snapshot, lock por tenant/crédito, revisão e dia esperado; chave idempotente impede duplicar pagamentos. Recibo, contador, saldos, razão e histórico entram na mesma transacção. Um estorno preserva o recibo e restaura os componentes hoje, sem reescrever mora de dias anteriores.
+- O razão guarda partidas equilibradas e imutáveis por movimento. Recebíveis contratuais (capital e juros) são reconhecidos contra desembolso e rendimento diferido; encargos pagos à parte ficam numa linha inicial separada, sem alterar o plano histórico. Encargos capitalizados integram capital amortizável. Esta representação é operacional, não substitui contabilidade financeira formal.
+- Mora acumula o valor decimal exacto por intervalo sobre capital/juros por pagar; apenas o total acumulado é arredondado. Pagamento/estorno actualizam primeiro a mora até hoje; novos saldos contam a partir do dia seguinte. Multa é avaliada uma única vez após tolerância. Execução diária e consulta são idempotentes.
+- Caixa partilhado por agência/dia; abertura e fecho pelo perfil com autoridade de desembolso. Numerário exige caixa aberto; estorno pelo gestor. Diferenças no fecho exigem motivo e lançamento equilibrado. Caixa é um atalho de Hoje, preservando os seis itens principais.
+- Créditos M4 recebem plano e lançamento inicial uma única vez, mediante atestação; novos desembolsos já os criam na mesma transacção. O procedimento de preparação/backfill deve preceder a activação de tarefas diárias em produção.
+
+- A abertura transporta para o razão a diferença entre numerário contado e saldo contabilístico anterior, sem duplicar a caixa do dia anterior. A conferência no fecho usa abertura + movimentos; diferenças são partidas separadas. Foi acrescentada uma comparação ao centavo entre saldo de numerário do razão e contagem final, além da carteira.
+- O arranque cloud foi actualizado em `start_skill` para incluir o worker, backfill e ligação privada de atestação. Instalação congelada e arranque/seed repetidos sem repor dados. O rascunho está guardado; a publicação do ambiente continua nas definições e não equivale a deploy Vercel/Supabase.
+
+### Validação M5 — 8 out 2026
+
+- Typecheck, lint, formatação, build e instalação congelada verdes. 146 testes unitários; cobertura histórica do motor acima de 95% em todas as métricas, sem alterar v1.
+- 36 verificações Auth/RLS, quatro grupos clientes/Storage/500, 12 de pedidos e 15 pagamentos/caixa/razão reais. Somas da carteira e numerário coincidem com o razão ao centavo. O worker processou uma data pendente; repetições não acrescentaram auditoria.
+- Playwright: 49 passaram, um omitido (500 em móvel, repetido em computador). M4/M5 repetidos com 12 verdes depois do ajuste de tabelas e acções; seis M5 novamente com a apresentação final de dinheiro. Scans axe e layout móvel sem violações detectadas.
+- Base vazia: 39 migrações, 28 tabelas públicas com RLS. Produção local final: login, Hoje/saldo/preview, PDF privado/QR, caixa/modelos e 390px; catálogo recusado, sem erros de navegador. Fonte incluída no trace; nenhum segredo financeiro nos assets do cliente.
+- Próximo marco M6. Arranque cloud guardado em rascunho, sem publicação/deploy alojado; limites e procedimentos registados em PROGRESS.md/RECOVERY.md.

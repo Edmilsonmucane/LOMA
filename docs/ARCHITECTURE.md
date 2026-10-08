@@ -60,3 +60,13 @@ O plano contractual é derivado com `simulateContract(1, ...)` e o motor v1 pres
 Pesquisa de créditos usa `search_loans`, com identidade/montante do snapshot aprovado, RLS explícita e paginação de 50. Eventos do pedido alimentam também a linha do tempo do cliente por trigger, preservando o autor.
 
 Consulta/download de contrato regista `log_contract_access` individualmente na auditoria, com contrato, autor e agência. Desembolso usa `loans.disburse`, independente de `payments.manage`, para não dar essa autoridade ao cobrador por defeito. Produtos com rascunho pendente continuam a usar o nome/condições da versão publicada; apenas arquivo retira a disponibilidade.
+
+## M5 — Fronteira financeira
+
+Servidor calcula `simulateContract` e assina plano com chave privada; RPC autenticado verifica assinatura e escopo antes de persistir. O código v1 permanece intacto. Novos desembolsos materializam plano/razão atomicamente; créditos anteriores têm inicialização idempotente. A chave não fornece privilégios de utilizador nem contorna RLS.
+
+`loan_accounts`, `loan_instalments`, `payments`, `payment_reversals`, `receipt_counters`, `journal_transactions`, `cash_sessions` e `cash_deposits` têm RLS. Escritas só por RPC com sessão, locks e escopo de agência. Pagamentos, estornos, depósitos e lançamentos são imutáveis; saldos derivados e revisões mudam sob lock. Transporte monetário dos RPCs usa strings exactas.
+
+Pré-visualização/gravação usam a mesma função SQL de cascata. `request_id`, revisão e dia esperado reforçam idempotência e evitam confirmar um saldo entretanto alterado. Estorno gera partidas inversas sem eliminar recibos. Numerário depende de caixa aberto e saldo disponível; fecho regista contagem e eventual diferença motivada. `financial_private.daily` só processa datas pendentes e não gera auditoria repetida em execuções sem alteração; cron alojado ou worker local equivalente, sem permissões PostgREST para invocar a tarefa global.
+
+Atalhos da paleta e de Hoje abrem a escolha de cliente/pagamento; tabelas e extracto recebem strings exactas dos RPCs. PDFs de recibo usam snapshot do modelo/marca, fonte incorporada e QR de acesso autenticado; consultas geram evento de auditoria e resposta privada sem cache. Download de recibo não transforma a autorização numa ligação pública.

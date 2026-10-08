@@ -18,8 +18,10 @@ type Row = {
 };
 export function ApplicationList({
   kind = 'applications',
+  paymentMode = false,
 }: {
   kind?: 'applications' | 'loans';
+  paymentMode?: boolean;
 }) {
   const states = kind === 'loans' ? loanStates : applicationStates;
   const stateKey = kind === 'loans' ? 'loanStates' : 'states';
@@ -146,7 +148,7 @@ export function ApplicationList({
                   .map((r) => (
                     <Link
                       className="application-card"
-                      href={`/app/${kind}/${r.id}`}
+                      href={`/app/${kind}/${r.id}${paymentMode ? '?payment=1' : ''}`}
                       key={r.id}
                     >
                       <strong>{r.client_name}</strong>
@@ -168,7 +170,10 @@ export function ApplicationList({
               key: 'client',
               heading: t('client'),
               render: (r) => (
-                <Link className="client-name" href={`/app/${kind}/${r.id}`}>
+                <Link
+                  className="client-name"
+                  href={`/app/${kind}/${r.id}${paymentMode ? '?payment=1' : ''}`}
+                >
                   {r.client_name}
                 </Link>
               ),
@@ -195,9 +200,11 @@ export function ApplicationList({
               render: (r) => (
                 <Badge
                   tone={
-                    ['approved', 'active'].includes(r.status)
-                      ? 'success'
-                      : 'neutral'
+                    r.status === 'overdue'
+                      ? 'danger'
+                      : ['approved', 'active'].includes(r.status)
+                        ? 'success'
+                        : 'neutral'
                   }
                 >
                   {t(`${stateKey}.${r.status}`)}

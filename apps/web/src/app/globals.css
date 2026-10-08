@@ -1344,3 +1344,100 @@ code {
 .loan-plan-table td {
   white-space: nowrap;
 }
+/* Financial surfaces retain the same quiet hierarchy and local table scrolling. */
+.today-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-6);
+  border-block: 1px solid var(--line);
+  padding-block: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+.today-summary > div {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.today-summary span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.today-summary strong {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.payment-preview {
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.payment-preview > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  padding-block: var(--space-3);
+}
+.payment-preview dd {
+  margin: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.payment-statement > div,
+.attention-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--line);
+  padding-block: var(--space-4);
+}
+.payment-statement p,
+.attention-row p {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.branch-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+}
+.branch-tabs a {
+  padding: var(--space-3);
+  min-height: 44px;
+}
+.branch-tabs a[aria-current] {
+  border-bottom: 1px solid var(--ink);
+}
+@media (max-width: 700px) {
+  .today-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.payment-summary > div:first-child dd {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.money-text {
+  white-space: nowrap;
+}
+.money-unit {
+  font-size: var(--text-base);
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: normal;
+}

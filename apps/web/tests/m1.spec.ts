@@ -178,7 +178,7 @@ test('staff login, brand configuration, agency and invitation work', async ({
     await expect(invited).toHaveURL(/\/app$/);
     await expect(
       invited.getByRole('heading', {
-        name: 'Prepare o seu microcrédito.',
+        name: 'Hoje',
         exact: true,
       }),
     ).toBeVisible();

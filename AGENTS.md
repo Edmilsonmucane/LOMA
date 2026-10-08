@@ -13,7 +13,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
 - Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
 
-## Comandos (M0–M4)
+## Comandos (M0–M5)
 
 - pnpm install --frozen-lockfile
 - pnpm services:start / pnpm services:stop
@@ -23,6 +23,8 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; 
 - pnpm test:rls (antes de Playwright; usa serviços reais)
 - pnpm test:clients (base/Auth/Storage reais e lote de 500)
 - pnpm test:applications (pedidos/contratos/desembolso e RLS reais)
+- pnpm test:payments (pagamentos/recibos/mora/caixa/razão e RLS reais; após test:applications)
+- pnpm backfill:local (planos históricos sem repor a base)
 - pnpm dev
 - pnpm typecheck
 - pnpm lint
@@ -53,3 +55,7 @@ Documentos usam sessão do utilizador, nunca service-role. Só paths reservados 
 ## Pedidos e contratos (M4)
 
 Decisão/desembolso apenas pelos RPCs autorizados, com revisão e locks. Não permitir auto-aprovação nem modificar contratos/eventos aprovados. Não aceitar um plano financeiro calculado pelo navegador. Contratos usam inputs imutáveis e engine_version; preservar v1 financeiro e introduzir nova versão para mudanças de comportamento. PDF usa snapshot, fonte incorporada e sessão/RLS, sem URLs públicas. A data de desembolso não reescreve vencimentos acordados. Pagamentos, razão e saldos efectivos entram em M5.
+
+## Dinheiro e caixa (M5)
+
+Chave FINANCIAL_SIGNING_KEY apenas no servidor e financial_private.signing_key. Nunca imprimir, incluir no browser ou reutilizar para autenticação. Atestar exclusivamente contratos lidos com sessão/RLS; assinatura não substitui autorização SQL. Desembolso, plano e razão na mesma transacção. SQL calcula imputação a partir dos saldos, revisão e snapshot; nunca aceitar allocations/totais do navegador. Chave idempotente deve sobreviver a tentativas repetidas. Recibo/contador/pagamento/razão/history são atómicos. Estorno append-only restaura componentes, preserva recibo e não recalcula mora histórica. Toda saída de numerário exige caixa aberto e fundos suficientes. Testar saldos por strings, equilíbrio de cada movimento e soma de recebíveis = carteira.

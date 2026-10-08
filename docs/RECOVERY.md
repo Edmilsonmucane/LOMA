@@ -35,3 +35,15 @@ Verificação M3 executada: dump restaurado numa base temporária, contagens de 
 ## Contratos — M4
 
 O dump inclui applications/contracts/loans/application_events, FKs/RLS e auditoria dos acessos ao PDF. Preservar código do motor histórico (engine_version) e dependências/fontes do PDF juntamente com o release. Não recalcular contratos restaurados com uma versão financeira diferente. Conferir contagens, snapshot, versão e plano exacto, além dos documentos privados existentes.
+
+## Operações financeiras — M5
+
+O backup integral inclui saldos, prestações, pagamentos, estornos, contador de recibos, caixa, depósitos, razão e `financial_private.signing_key`. Tratar o dump como segredo e dados pessoais. Restaurar os oito conjuntos financeiros juntos; nunca restaurar só pagamentos ou reiniciar o contador. Recibos estornados conservam os seus números. Conferir unicidade de recibos e IDs idempotentes, equilíbrio de cada journal e soma dos recebíveis contra prestações por pagar; verificar também saldo a favor e caixa.
+
+A chave de 32 bytes em hexadecimal nasce aleatoriamente na migração e não é exposta pelo PostgREST. `pnpm local:env` lê-a com a ligação administrativa local e grava `FINANCIAL_SIGNING_KEY` em `.env.local` 0600. Não imprimir o valor, enviar em chat ou pôr em Git. Em produção, copiar com ferramenta administrativa segura para o segredo do servidor Vercel; não usar prefixo NEXT_PUBLIC. Preservar o valor entre releases/restauros. Rotação exige coordenar base e servidor, invalidando as atestações antigas de cinco minutos; pagamentos/recibos já gravados não mudam. Uma divergência falha fechada.
+
+Upgrade de produção: fazer backup, suspender novas operações financeiras, aplicar migrações, instalar o motor histórico preservado e chave do servidor, inicializar os créditos M4 uma vez com o motor v1 (administrador de base, procedimento equivalente ao backfill local), conferir razão/carteira e só depois retomar. Não aceitar um plano fornecido por utilizadores nem usar service-role para contornar operações de negócio. O administrador de migração tem uma função distinta das sessões operacionais. Novos desembolsos já gravam plano/razão atomicamente.
+
+A migração regista `loma-overdue-daily` em pg_cron se a extensão estiver disponível no Supabase. Verificar cron.job activo e cron.job_run_details após deploy; se não disponível, preparar um worker equivalente com ligação administrativa restrita que invoque apenas `financial_private.daily()`. No ambiente local o contentor daily executa essa função a cada 30 segundos e tenta novamente em falhas; somente datas pendentes são processadas. Não há mensagens externas nesta tarefa M5. Vigiar logs do worker e estado das datas processadas.
+
+Pagamento, estorno ou consulta de crédito actualizam mora até ao dia actual antes de alterar saldos. Dias passados usam o saldo anterior; estorno devolve dívida hoje e não reescreve juros passados. Registo de pagamentos retroactivos não está activo; usar a data efectiva actual e referência, para não alterar intervalos fechados sem reprocessamento financeiro. Restauro deve incluir os acumuladores decimais e a data de apuramento.

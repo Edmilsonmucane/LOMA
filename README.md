@@ -4,7 +4,7 @@ Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ, 
 
 ## Estado
 
-M0–M4: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos registados, mensagens e site público entram em M5–M8.
+M0–M5: sistema de design, tenants isolados por RLS, autenticação do pessoal, perfis editáveis, agências, marca, auditoria, TOTP e painel da plataforma. Motor financeiro puro com cinco métodos, carência, encargos, mora, imputação e liquidação antecipada. Produtos têm assistente com simulação viva, presets editáveis e versões imutáveis; começam em rascunho e o gestor publica as condições. Clientes têm fichas completas, pesquisa, listas, consentimento, notas, documentos privados e importação CSV. Pedidos têm análise, decisão por outro colaborador, contrato PDF com snapshot imutável e desembolso manual. Pagamentos têm imputação real, recibo PDF numerado com QR e estornos auditados. Caixa por agência inclui abertura, depósitos e fecho com conferência; o razão subjacente é de partidas dobradas. Hoje mostra carteira real e acções directas. Mensagens, site público e acabamento entram em M6–M8.
 
 ## Instalar e correr
 
@@ -21,7 +21,7 @@ pnpm dev
 
 A instalação com imagens em cache demora habitualmente menos de 10 minutos; o primeiro descarregamento depende da rede. O comando de serviços aplica as migrações SQL e preserva o volume existente. `pnpm services:stop` pára os serviços sem apagar dados. Não usar `down --volumes` em bases com dados a preservar.
 
-O painel da plataforma usa o host raiz na rota `/login`. O microcrédito de demonstração usa `demo.localhost:3000/login`; o segundo tenant usa `beira.localhost:3000/login`. O navegador deve resolver subdomínios de localhost (Chromium faz isso). As credenciais aleatórias dos cinco utilizadores locais estão apenas em `.local/accounts.json`; abra esse ficheiro localmente, sem o partilhar ou colocar no Git. A seed é repetível e não redefine palavras-passe nem apaga dados existentes. Convites de equipa são capturados pelo Mailpit, porta 54324, sem enviar emails externos.
+O painel da plataforma usa o host raiz na rota `/login`. O microcrédito de demonstração usa `demo.localhost:3000/login`; o segundo tenant usa `beira.localhost:3000/login`. O navegador deve resolver subdomínios de localhost (Chromium faz isso). As credenciais aleatórias dos utilizadores locais estão apenas em `.local/accounts.json`; abra esse ficheiro localmente, sem o partilhar ou colocar no Git. A seed é repetível e não redefine palavras-passe nem apaga dados existentes. Convites de equipa são capturados pelo Mailpit, porta 54324, sem enviar emails externos.
 
 `/design` mostra o catálogo de componentes durante desenvolvimento e devolve 404 em produção. A demonstração financeira com 120 clientes e `pnpm seed` será entregue em M8.
 
@@ -37,6 +37,8 @@ pnpm test
 pnpm test:engine
 pnpm test:rls
 pnpm test:clients
+pnpm test:applications
+pnpm test:payments
 pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 pnpm build
@@ -96,3 +98,15 @@ Em **Pedidos**, crie um rascunho com cliente, produto publicado, montante, prazo
 Em **Definições → Mensagens e documentos**, personalize o modelo do contrato. Na aprovação, condições, marca, cliente e modelo ficam copiados num contrato imutável. Descarregue o PDF e recolha a assinatura. O caixa regista o desembolso com referência/método e confirmação da assinatura. A data deve corresponder à acordada; ajustes posteriores exigem novo pedido. O crédito e plano aparecem em **Créditos**. Os pagamentos/recibos/caixa serão acrescentados no M5.
 
 `pnpm test:applications` verifica o fluxo com PostgreSQL/Auth reais, revisões, requisitos, perfis, auto-aprovação, snapshots, concorrência, RLS e agência. Fixtures locais incluem agora analista e caixa, com credenciais privadas em `.local/accounts.json`; não há palavra-passe pública.
+
+## Pagamentos e caixa — M5
+
+Créditos → Registar pagamento → escolher cliente → valor/método → conferir imputação → confirmar. A paleta Cmd/Ctrl+K tem o mesmo atalho. Hoje abre directamente o pagamento de uma prestação por receber. Numerário exige caixa aberto; outros métodos exigem referência. Preview usa os saldos actuais e condições aprovadas. Pagamento repetido não duplica recibo ou dinheiro; alterações concorrentes pedem nova conferência.
+
+O recibo fica no extracto do crédito e inclui QR de acesso autenticado. Definições → Mensagens e documentos permite editar o modelo apenas para novos recibos. Quem tem permissão de estorno fornece motivo; o original permanece e aparece como estornado. O estorno restaura o saldo hoje, preservando a mora já apurada.
+
+Hoje → Ver caixa → escolher agência. Abrir com numerário contado; registar depósitos; fechar com contagem. Diferenças exigem motivo. Depois do fecho não há movimentos em numerário nesse dia. Comissões pagas à parte aparecem como encargos iniciais, por pagar até registadas; o desembolso não pressupõe recebê-las. Excedentes ficam adiantados ou a favor, conforme o contrato.
+
+`pnpm test:payments` executa após `pnpm test:applications` e verifica base/Auth reais, numeração sem lacunas, pagamentos concorrentes, mora, excedentes, estornos, seis métodos, caixa, task automática e soma do razão/carteira. Os oito novos conjuntos de dados têm RLS; não há escrita financeira directa.
+
+O worker local corre com `pnpm services:start` e processa datas pendentes de forma idempotente. Supabase usa pg_cron, quando disponível, com tarefa a cada 15 minutos; o cálculo continua diário, por data civil. `pnpm backfill:local` inicializa uma vez os planos anteriores ao M5, sem apagar dados. Chave de atestação, preparação de produção e recuperação estão em docs/RECOVERY.md. Lembretes automáticos pertencem ao M6; nenhum envio fictício é apresentado no M5.

@@ -235,6 +235,110 @@ export type Database = {
           },
         ];
       };
+      cash_deposits: {
+        Row: {
+          amount: number;
+          branch_id: string;
+          cash_session_id: string;
+          created_at: string;
+          id: string;
+          recorded_by: string;
+          reference: string;
+          request_id: string;
+          tenant_id: string;
+        };
+        Insert: {
+          amount: number;
+          branch_id: string;
+          cash_session_id: string;
+          created_at?: string;
+          id?: string;
+          recorded_by: string;
+          reference: string;
+          request_id: string;
+          tenant_id: string;
+        };
+        Update: {
+          amount?: number;
+          branch_id?: string;
+          cash_session_id?: string;
+          created_at?: string;
+          id?: string;
+          recorded_by?: string;
+          reference?: string;
+          request_id?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'cash_deposits_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'cash_deposits_cash_session_id_tenant_id_fkey';
+            columns: ['cash_session_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'cash_sessions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      cash_sessions: {
+        Row: {
+          branch_id: string;
+          closed_at: string | null;
+          closed_by: string | null;
+          counted: number | null;
+          day: string;
+          difference_reason: string;
+          expected: number | null;
+          id: string;
+          opened_at: string;
+          opened_by: string;
+          opening: number;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          counted?: number | null;
+          day: string;
+          difference_reason?: string;
+          expected?: number | null;
+          id?: string;
+          opened_at?: string;
+          opened_by: string;
+          opening: number;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          counted?: number | null;
+          day?: string;
+          difference_reason?: string;
+          expected?: number | null;
+          id?: string;
+          opened_at?: string;
+          opened_by?: string;
+          opening?: number;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'cash_sessions_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
       client_documents: {
         Row: {
           client_id: string;
@@ -472,6 +576,179 @@ export type Database = {
           },
         ];
       };
+      journal_transactions: {
+        Row: {
+          branch_id: string;
+          cash_session_id: string | null;
+          created_at: string;
+          id: string;
+          loan_id: string | null;
+          payment_id: string | null;
+          postings: Json;
+          source: string;
+          source_key: string;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          id?: string;
+          loan_id?: string | null;
+          payment_id?: string | null;
+          postings: Json;
+          source: string;
+          source_key: string;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          id?: string;
+          loan_id?: string | null;
+          payment_id?: string | null;
+          postings?: Json;
+          source?: string;
+          source_key?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'journal_transactions_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'journal_transactions_cash_session_id_tenant_id_fkey';
+            columns: ['cash_session_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'cash_sessions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'journal_transactions_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'journal_transactions_payment_id_tenant_id_fkey';
+            columns: ['payment_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'payments';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      loan_accounts: {
+        Row: {
+          branch_id: string;
+          credit: number;
+          loan_id: string;
+          revision: number;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          credit?: number;
+          loan_id: string;
+          revision?: number;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          credit?: number;
+          loan_id?: string;
+          revision?: number;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'loan_accounts_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'loan_accounts_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      loan_instalments: {
+        Row: {
+          accrued_on: string;
+          branch_id: string;
+          due_date: string;
+          fine: number;
+          fine_assessed: boolean;
+          from_date: string;
+          interest: number;
+          late_assessed: number;
+          late_interest: number;
+          late_raw: number;
+          loan_id: string;
+          number: number;
+          principal: number;
+          tenant_id: string;
+        };
+        Insert: {
+          accrued_on: string;
+          branch_id: string;
+          due_date: string;
+          fine?: number;
+          fine_assessed?: boolean;
+          from_date: string;
+          interest: number;
+          late_assessed?: number;
+          late_interest?: number;
+          late_raw?: number;
+          loan_id: string;
+          number: number;
+          principal: number;
+          tenant_id: string;
+        };
+        Update: {
+          accrued_on?: string;
+          branch_id?: string;
+          due_date?: string;
+          fine?: number;
+          fine_assessed?: boolean;
+          from_date?: string;
+          interest?: number;
+          late_assessed?: number;
+          late_interest?: number;
+          late_raw?: number;
+          loan_id?: string;
+          number?: number;
+          principal?: number;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'loan_instalments_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'loan_instalments_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
       loans: {
         Row: {
           branch_id: string;
@@ -581,6 +858,150 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'tenants';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      payment_reversals: {
+        Row: {
+          branch_id: string;
+          cash_session_id: string | null;
+          created_at: string;
+          id: string;
+          loan_id: string;
+          payment_id: string;
+          reason: string;
+          recorded_by: string;
+          tenant_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          id?: string;
+          loan_id: string;
+          payment_id: string;
+          reason: string;
+          recorded_by: string;
+          tenant_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          id?: string;
+          loan_id?: string;
+          payment_id?: string;
+          reason?: string;
+          recorded_by?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payment_reversals_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'payment_reversals_cash_session_id_tenant_id_fkey';
+            columns: ['cash_session_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'cash_sessions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'payment_reversals_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'payment_reversals_payment_id_tenant_id_fkey';
+            columns: ['payment_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'payments';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+        ];
+      };
+      payments: {
+        Row: {
+          allocations: Json;
+          amount: number;
+          branch_id: string;
+          cash_session_id: string | null;
+          created_at: string;
+          credit: number;
+          id: string;
+          loan_id: string;
+          method: string;
+          paid_on: string;
+          receipt_number: number;
+          receipt_snapshot: Json;
+          recorded_by: string;
+          reference: string;
+          request_id: string;
+          tenant_id: string;
+        };
+        Insert: {
+          allocations: Json;
+          amount: number;
+          branch_id: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          credit: number;
+          id?: string;
+          loan_id: string;
+          method: string;
+          paid_on: string;
+          receipt_number: number;
+          receipt_snapshot: Json;
+          recorded_by: string;
+          reference: string;
+          request_id: string;
+          tenant_id: string;
+        };
+        Update: {
+          allocations?: Json;
+          amount?: number;
+          branch_id?: string;
+          cash_session_id?: string | null;
+          created_at?: string;
+          credit?: number;
+          id?: string;
+          loan_id?: string;
+          method?: string;
+          paid_on?: string;
+          receipt_number?: number;
+          receipt_snapshot?: Json;
+          recorded_by?: string;
+          reference?: string;
+          request_id?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payments_branch_id_tenant_id_fkey';
+            columns: ['branch_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'branches';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'payments_cash_session_id_tenant_id_fkey';
+            columns: ['cash_session_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'cash_sessions';
+            referencedColumns: ['id', 'tenant_id'];
+          },
+          {
+            foreignKeyName: 'payments_loan_id_tenant_id_fkey';
+            columns: ['loan_id', 'tenant_id'];
+            isOneToOne: false;
+            referencedRelation: 'loans';
+            referencedColumns: ['id', 'tenant_id'];
           },
         ];
       };
@@ -754,6 +1175,29 @@ export type Database = {
           },
         ];
       };
+      receipt_counters: {
+        Row: {
+          last_number: number;
+          tenant_id: string;
+        };
+        Insert: {
+          last_number?: number;
+          tenant_id: string;
+        };
+        Update: {
+          last_number?: number;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'receipt_counters_tenant_id_fkey';
+            columns: ['tenant_id'];
+            isOneToOne: true;
+            referencedRelation: 'tenants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       tenant_configuration: {
         Row: {
           category: string;
@@ -890,6 +1334,7 @@ export type Database = {
         Returns: string;
       };
       branch_allowed: { Args: { b: string; t: string }; Returns: boolean };
+      cash_summary: { Args: { b: string; t: string }; Returns: Json };
       client_allowed: {
         Args: { c: string; p?: string; t: string };
         Returns: boolean;
@@ -910,6 +1355,20 @@ export type Database = {
           expected_revision: number;
           payment_method: string;
           payment_reference: string;
+          plan_payload: string;
+          plan_signature: string;
+          signature_date: string;
+          t: string;
+        };
+        Returns: string;
+      };
+      disburse_application_v4: {
+        Args: {
+          a_id: string;
+          disbursement_date: string;
+          expected_revision: number;
+          payment_method: string;
+          payment_reference: string;
           signature_date: string;
           t: string;
         };
@@ -917,6 +1376,15 @@ export type Database = {
       };
       has_permission: { Args: { p: string; t: string }; Returns: boolean };
       import_clients: { Args: { rows: Json; t: string }; Returns: Json };
+      initialise_loan: {
+        Args: {
+          l: string;
+          plan_payload: string;
+          plan_signature: string;
+          t: string;
+        };
+        Returns: undefined;
+      };
       is_platform_admin: { Args: never; Returns: boolean };
       link_existing_member: {
         Args: {
@@ -928,12 +1396,32 @@ export type Database = {
         };
         Returns: boolean;
       };
+      loan_balance: { Args: { l: string; t: string }; Returns: Json };
       log_access: { Args: { t: string }; Returns: undefined };
       log_contract_access: {
         Args: { c_id: string; t: string };
         Returns: undefined;
       };
       log_platform_access: { Args: never; Returns: undefined };
+      log_receipt_access: {
+        Args: { p: string; t: string };
+        Returns: undefined;
+      };
+      manage_cash: {
+        Args: {
+          amount: string;
+          b: string;
+          operation: string;
+          reference?: string;
+          request_id?: string;
+          t: string;
+        };
+        Returns: string;
+      };
+      preview_payment: {
+        Args: { amount: string; l: string; t: string };
+        Returns: Json;
+      };
       product_shape: { Args: { c: Json }; Returns: boolean };
       provision_tenant: {
         Args: {
@@ -944,6 +1432,20 @@ export type Database = {
         };
         Returns: string;
       };
+      record_payment: {
+        Args: {
+          amount: string;
+          expected_day: string;
+          expected_revision: number;
+          l: string;
+          payment_method: string;
+          payment_reference: string;
+          request_id: string;
+          t: string;
+        };
+        Returns: string;
+      };
+      refresh_loan: { Args: { l: string; t: string }; Returns: undefined };
       reserve_client_document: {
         Args: { c: string; document_data: Json; t: string };
         Returns: {
@@ -978,6 +1480,10 @@ export type Database = {
           require_mfa: boolean;
           slug: string;
         }[];
+      };
+      reverse_payment: {
+        Args: { p_id: string; reason: string; t: string };
+        Returns: string;
       };
       save_application: {
         Args: {
@@ -1065,6 +1571,7 @@ export type Database = {
           user_count: number;
         }[];
       };
+      today_summary: { Args: { t: string }; Returns: Json };
       transition_application: {
         Args: {
           a_id: string;

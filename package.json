@@ -24,7 +24,9 @@
     "backup:local": "node scripts/backup-local.mjs",
     "test:engine": "vitest run packages/loan-engine --coverage",
     "test:clients": "node scripts/test-clients.mjs",
-    "test:applications": "node scripts/test-applications.mjs"
+    "test:applications": "node scripts/test-applications.mjs",
+    "test:payments": "node scripts/test-payments.mjs",
+    "backfill:local": "node scripts/backfill-loans.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

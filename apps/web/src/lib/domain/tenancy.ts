@@ -11,6 +11,8 @@ export const permissionKeys = [
   'loans.read',
   'loans.disburse',
   'payments.manage',
+  'payments.reverse',
+  'cash.manage',
   'collections.manage',
   'messages.manage',
   'reports.read',
