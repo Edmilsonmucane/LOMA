@@ -1,0 +1,80 @@
+# LOMA — regras do projecto
+
+Plataforma SaaS white-label de microcrédito para Moçambique. Interface pt-MZ; código e identificadores em inglês. Moeda inicial MZN, fuso Africa/Maputo.
+
+## Trabalho
+
+- Trabalhar por marcos M0–M8, em ordem. Antes de avançar: typecheck, lint, testes e commit; actualizar docs e relatar feito/falta.
+- Escolher decisões simples e reversíveis; registar em docs/DECISIONS.md.
+- Não fixar regras financeiras, fiscais ou legais no código. Condições aprovadas são snapshots imutáveis.
+- Dinheiro em bigint (centavos); taxas em decimal.js; arredondamento meio para cima.
+- Isolamento por tenant e RLS em todas as tabelas de negócio. Nunca guardar segredos no Git.
+- Textos visíveis em catálogos next-intl; componentes sem textos fixos.
+- Tokens próprios; Phosphor regular; Radix sem estilo; respeitar docs/DESIGN.md.
+- Usar o checkout existente: cada tarefa cloud já é isolada. Não criar worktrees sem pedido explícito.
+
+## Comandos (M0–M8)
+
+- pnpm install --frozen-lockfile
+- pnpm services:start / pnpm services:stop
+- pnpm local:env / pnpm seed (bootstrap e demonstração; idempotente)
+- pnpm db:types (após migrações)
+- pnpm backup:local (dump privado; ver docs/RECOVERY.md)
+- pnpm test:rls (antes de Playwright; usa serviços reais)
+- pnpm test:clients (base/Auth/Storage reais e lote de 500)
+- pnpm test:applications (pedidos/contratos/desembolso e RLS reais)
+- pnpm test:payments (pagamentos/recibos/mora/caixa/razão e RLS reais; após test:applications)
+- pnpm test:public (site/cliente/Auth/Storage reais; após test:applications, antes de Playwright)
+- pnpm public:assets
+- pnpm test:site-quality (servidor de produção na porta 3200; Lighthouse móvel e orçamento JS)
+- pnpm test:m8 (relatórios/scoring/demonstração reais; antes de Playwright)
+- pnpm test:fresh (base temporária vazia, sem apagar volumes)
+- pnpm test:messages (comunicações/campanhas/cobranças reais; após test:applications)
+- pnpm messages:run / pnpm messages:watch
+- pnpm backfill:local (planos históricos sem repor a base)
+- pnpm dev
+- pnpm typecheck
+- pnpm lint
+- pnpm test
+- pnpm test:engine (cobertura mínima de 95%)
+- pnpm test:e2e
+- pnpm build
+- pnpm format:check
+
+## Memória
+
+Ler docs/DECISIONS.md, docs/ARCHITECTURE.md e docs/DESIGN.md antes de alterações estruturais. Não declarar marcos aceites sem validação executada.
+
+## Segurança de M1
+
+Operações de negócio usam cliente Supabase com cookies do utilizador e RLS. Service-role apenas para convites já autorizados; nunca para contornar políticas. Helpers SQL com search_path vazio; índices e chaves estrangeiras compostas com tenant_id. Não alterar migrações já aplicadas. .local e .env.local são privados, nunca imprimir os seus valores.
+
+## Produtos e motor (M2)
+
+Ler docs/LOAN_ENGINE.md antes de mudar cálculos. Não converter dinheiro ou taxas para Number. Versões de produto são imutáveis; gravação apenas por save_product, com revisão esperada e autorização. Conflitos usam PT409: SQLSTATE 40001 pode provocar repetição automática no PostgREST. Presets são dados editáveis, não regras jurídicas. Não imprimir argumentos de Server Actions; podem conter palavras-passe ou dados pessoais.
+
+## Clientes (M3)
+
+save_client é a fronteira de escrita, com revisão esperada e chaves normalizadas únicas por tenant. Agência antiga e nova devem estar autorizadas. search_clients valida sessão/permissão e agência uma vez, dentro do RPC, e restringe o tenant explicitamente; não remover essas condições para acelerar a pesquisa. Histórico e consentimento são append-only. Dinheiro fica em colunas bigint geradas a partir dos valores exactos em JSON; ao transportar montantes use as strings exactas do perfil, não números JavaScript vindos do PostgREST.
+
+Documentos usam sessão do utilizador, nunca service-role. Só paths reservados podem receber upload; ficheiros concluídos não são sobrescritos. Conferir bucket privado e políticas por cliente, tenant e agência. Ligações assinadas e traces de navegador são credenciais temporárias/dados privados: não imprimir nem colocar no Git. Antes de build, terminar verificações em dev; build concorrente com Next dev pode deixar o compilador de desenvolvimento preso neste ambiente.
+
+## Pedidos e contratos (M4)
+
+Decisão/desembolso apenas pelos RPCs autorizados, com revisão e locks. Não permitir auto-aprovação nem modificar contratos/eventos aprovados. Não aceitar um plano financeiro calculado pelo navegador. Contratos usam inputs imutáveis e engine_version; preservar v1 financeiro e introduzir nova versão para mudanças de comportamento. PDF usa snapshot, fonte incorporada e sessão/RLS, sem URLs públicas. A data de desembolso não reescreve vencimentos acordados. Pagamentos, razão e saldos efectivos entram em M5.
+
+## Dinheiro e caixa (M5)
+
+Chave FINANCIAL_SIGNING_KEY apenas no servidor e financial_private.signing_key. Nunca imprimir, incluir no browser ou reutilizar para autenticação. Atestar exclusivamente contratos lidos com sessão/RLS; assinatura não substitui autorização SQL. Desembolso, plano e razão na mesma transacção. SQL calcula imputação a partir dos saldos, revisão e snapshot; nunca aceitar allocations/totais do navegador. Chave idempotente deve sobreviver a tentativas repetidas. Recibo/contador/pagamento/razão/history são atómicos. Estorno append-only restaura componentes, preserva recibo e não recalcula mora histórica. Toda saída de numerário exige caixa aberto e fundos suficientes. Testar saldos por strings, equilíbrio de cada movimento e soma de recebíveis = carteira.
+
+## Comunicação e cobranças (M6)
+
+Credenciais apenas cifradas em communication_private; nunca devolver ou imprimir token/callback secret. Sessões operacionais usam RPC/RLS, nunca a ligação técnica do worker. Custos são strings de centavos. Consentimento e opt-out são conferidos no enqueue e no despacho; uma edição normal não remove bloqueios. Não chamar accepted de delivered. Persistir uncertain/dispatching antes do provedor; interrupção/timeout não pode gerar reenvio automático. Retry apenas em rejeição explícita, com backoff editável. DNS público fixado na ligação TLS, sem destinos privados/redireccionamentos. Callbacks exigem HMAC dos bytes exactos, tenant/canal e deduplicação. Não correr serviços/seed/testes de base durante Playwright; test:messages pausa/retoma apenas o worker que encontrou activo.
+
+## Site e cliente (M7)
+
+Ler docs/PUBLIC_SITE.md. portalDb usa sb-loma-customer, separado do pessoal. Autenticação de telefone não concede membership. customer_owns e RPCs conferem Auth/sessão/tenant/vínculo; nunca permitir notas internas ou carteira alheia na área do cliente. Dados de ficha existente são proposta, não edição automática. Upload só em path reservado num rascunho próprio, com JWT do cliente e RLS do Storage. PUBLIC_REQUEST_SIGNING_KEY é separada das chaves de finanças/integrações, nunca impressa. Console SMS local contém códigos temporários e só pode ser lido em contexto privado de desenvolvimento/teste. CAPTCHA/provedor Auth alojados precisam de configuração própria. Nenhum API/documento/ecrã pessoal entra na cache PWA. Não alterar v1 para criar o simulador público.
+
+## Relatórios, scoring e demonstração (M8)
+
+Ler docs/REPORTS_SCORING_DEMO.md. Relatórios usam reports.read e tenant/agência explícitos; CSV/PDF partilham dados, totais e auditoria. Provisões arredondam por crédito, antes de agregar. Nunca chamar soma de desembolsos+recebimentos de saldo. Score usa evidência e pesos editáveis, é sugestão e não muda contratos. Histórico de avaliações é imutável. Demonstração só em tenant identificado e vazio na activação; reposição assinada arquiva a geração anterior, não apaga dados nem contorna invariantes. Assinatura demo: não serve autenticação. Nenhum provedor externo na demonstração. Fixtures temporais de teste só alteram propostas antes da aprovação.

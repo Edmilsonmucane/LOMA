@@ -1,0 +1,1 @@
+do $$declare b text;begin b:=pg_get_functiondef('communication_private.prepare(uuid)'::regprocedure);b:=replace(b,'message_jobs.reason=suppression_reason','reason=suppression_reason');execute b;end;$$;

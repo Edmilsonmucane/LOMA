@@ -1,0 +1,42 @@
+name: Quality
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm services:start
+      - run: pnpm local:env
+      - run: pnpm seed
+      - run: pnpm test:rls
+      - run: pnpm test:clients
+      - run: pnpm test:applications
+      - run: pnpm test:payments
+      - run: pnpm test:messages
+      - run: pnpm test:public
+      - run: pnpm test:m8
+      - run: pnpm test:fresh
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm test:engine
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm build
+      - name: Mobile public site quality
+        run: |
+          pnpm --filter @loma/web start --port 3200 > .local/site-quality-server.log 2>&1 &
+          site_server_pid=$!
+          trap 'kill "$site_server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3200/ >/dev/null; then break; fi
+            sleep 1
+          done
+          pnpm test:site-quality

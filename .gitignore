@@ -147,3 +147,15 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# LOMA tooling outputs
+.pnpm-cache/
+.pnpm-state/
+playwright-report/
+test-results/
+next-env.d.ts
+
+# Local Supabase state and generated credentials
+supabase/.temp/
+supabase/.branches/
+.local/

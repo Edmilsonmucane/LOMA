@@ -1,0 +1,121 @@
+name: loma-local
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: ${LOMA_LOCAL_DB_PASSWORD}
+    ports: ['127.0.0.1:54322:5432']
+    volumes:
+      - loma-db:/var/lib/postgresql/data
+      - ./local-bootstrap.sql:/docker-entrypoint-initdb.d/01-bootstrap.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  auth:
+    image: supabase/gotrue:v2.186.0
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      NO_PROXY: localhost,127.0.0.1,db,auth,rest,mail,api
+      no_proxy: localhost,127.0.0.1,db,auth,rest,mail,api
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://127.0.0.1:54321
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres?sslmode=disable
+      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_URI_ALLOW_LIST: http://*.localhost:3000/auth/callback,http://localhost:3000/auth/callback
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_EXTERNAL_PHONE_ENABLED: 'true'
+      GOTRUE_SMS_AUTOCONFIRM: 'false'
+      GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_SMS_URI: pg-functions://postgres/public/console_sms_hook
+      GOTRUE_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+      GOTRUE_MAILER_AUTOCONFIRM: 'false'
+      GOTRUE_PASSWORD_MIN_LENGTH: 8
+      GOTRUE_MFA_ENABLED: 'true'
+      GOTRUE_MFA_TOTP_ENROLL_ENABLED: 'true'
+      GOTRUE_MFA_TOTP_VERIFY_ENABLED: 'true'
+      GOTRUE_SMTP_HOST: mail
+      GOTRUE_SMTP_PORT: 1025
+      GOTRUE_SMTP_ADMIN_EMAIL: equipa@loma.test
+      GOTRUE_SMTP_SENDER_NAME: LOMA
+      GOTRUE_MAILER_SUBJECTS_INVITE: Convite para a equipa do microcrédito
+      GOTRUE_MAILER_TEMPLATES_INVITE: http://api:8080/templates/invite
+  rest:
+    image: postgrest/postgrest:v14.3
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
+  storage:
+    image: supabase/storage-api:v1.33.0
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      NO_PROXY: localhost,127.0.0.1,db,auth,rest,mail,api,storage
+      no_proxy: localhost,127.0.0.1,db,auth,rest,mail,api,storage
+      ANON_KEY: ${LOMA_LOCAL_ANON_KEY}
+      SERVICE_KEY: ${LOMA_LOCAL_SERVICE_KEY}
+      PGRST_JWT_SECRET: ${LOMA_LOCAL_JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      FILE_SIZE_LIMIT: 5242880
+      TENANT_ID: loma-local
+      REGION: local
+      GLOBAL_S3_BUCKET: local
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+    volumes:
+      - loma-storage:/var/lib/storage
+  daily:
+    image: postgres:17-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: ${LOMA_LOCAL_DB_PASSWORD}
+    command: ['sh', '/runtime/daily.sh']
+    volumes: ['../scripts/daily-local.sh:/runtime/daily.sh:ro']
+  messages:
+    image: node:24-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    working_dir: /workspace/LOMA
+    environment:
+      COMMUNICATION_DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+    command: ['node', 'scripts/message-worker.mjs', '--watch']
+    volumes: ['../:/workspace/LOMA:ro']
+  auth-console:
+    image: node:24-alpine
+    depends_on:
+      db: { condition: service_healthy }
+    working_dir: /workspace/LOMA
+    environment:
+      AUTH_CONSOLE_DATABASE_URL: postgres://postgres:${LOMA_LOCAL_DB_PASSWORD}@db:5432/postgres
+    command: ['node', 'scripts/auth-console.mjs']
+    volumes: ['../:/workspace/LOMA:ro']
+  mail:
+    image: axllent/mailpit:v1.22.3
+    ports: ['127.0.0.1:54324:8025']
+  api:
+    image: node:24-alpine
+    command: ['node', '/runtime/local-proxy.mjs']
+    ports: ['127.0.0.1:54321:8080']
+    volumes:
+      - ../scripts/local-proxy.mjs:/runtime/local-proxy.mjs:ro
+      - ./templates/invite.html:/runtime/invite.html:ro
+volumes:
+  loma-db:
+  loma-storage:

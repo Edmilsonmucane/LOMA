@@ -1,0 +1,6 @@
+create function public.search_applications(t uuid,query text default '',selected_status text default '',page_offset integer default 0) returns jsonb language plpgsql stable security definer set search_path='' as $$declare result jsonb;begin
+ if not public.has_permission(t,'applications.read') then raise exception 'Access denied' using errcode='42501';end if;
+ select coalesce(jsonb_agg(to_jsonb(x)),'[]') into result from (select a.id,a.status,a.principal,a.periods,a.start_date,a.created_at,c.name client_name,v.name product_name from public.applications a join public.clients c on c.id=a.client_id and c.tenant_id=a.tenant_id join public.product_versions v on v.id=a.product_version_id and v.tenant_id=a.tenant_id where a.tenant_id=t and public.branch_allowed(t,a.branch_id) and (selected_status='' or a.status=selected_status) and (query='' or strpos(lower(extensions.unaccent(c.name)),lower(extensions.unaccent(query)))>0 or strpos(a.id::text,lower(query))>0) order by a.created_at desc,a.id limit 51 offset greatest(0,page_offset)) x;return result;
+end;$$;
+revoke all on function public.search_applications(uuid,text,text,integer) from public,anon;
+grant execute on function public.search_applications(uuid,text,text,integer) to authenticated;

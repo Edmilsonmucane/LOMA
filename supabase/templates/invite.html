@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="pt-MZ">
+  <body>
+    <p>Foi convidado para {{ .Data.tenant_name }}.</p>
+    <p>Defina uma palavra-passe para começar a trabalhar com a sua equipa.</p>
+    <p>
+      <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=invite"
+        >Aceitar convite</a
+      >
+    </p>
+    <p>Se não esperava este convite, contacte o gestor do microcrédito.</p>
+  </body>
+</html>

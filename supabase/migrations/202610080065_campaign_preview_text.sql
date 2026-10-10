@@ -1,0 +1,1 @@
+do $$declare b text;begin b:=pg_get_functiondef('public.preview_campaign(uuid,uuid,text,text,jsonb)'::regprocedure);b:=replace(b,$old$'body',tpl->>'body',$old$,$new$'body',(tpl->>'body')||E'\n'||(communication_private.rules(t)->>'optOutText'),$new$);execute b;end;$$;

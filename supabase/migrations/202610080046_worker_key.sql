@@ -1,0 +1,1 @@
+do $$declare b text;begin b:=pg_get_functiondef('communication_private.prepare(uuid)'::regprocedure);b:=replace(b,'key text;','encryption_key text;');b:=replace(b,'into key from','into encryption_key from');b:=replace(b,'decrypt(cipher,key)','decrypt(cipher,encryption_key)');execute b;end;$$;
